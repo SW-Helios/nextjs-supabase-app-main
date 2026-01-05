@@ -1,0 +1,123 @@
+import type { User } from "@/lib/types/models";
+
+/**
+ * 더미 사용자 데이터
+ *
+ * 호스트 5명 + 참여자 5명 = 총 10명의 더미 사용자
+ * 실제 같은 한국 이름과 이메일을 사용합니다.
+ */
+export const dummyUsers: User[] = [
+  // 호스트 (Host) 사용자들
+  {
+    id: "user-001",
+    email: "김민준@gather.com",
+    full_name: "김민준",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=minjun",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-002",
+    email: "이서연@gather.com",
+    full_name: "이서연",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=seoyeon",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-003",
+    email: "박준서@gather.com",
+    full_name: "박준서",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=junseo",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-004",
+    email: "최지우@gather.com",
+    full_name: "최지우",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=jiwoo",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-005",
+    email: "정수아@gather.com",
+    full_name: "정수아",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=sua",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+
+  // 참여자 (Participant) 사용자들
+  {
+    id: "user-006",
+    email: "강하윤@gather.com",
+    full_name: "강하윤",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=hayoon",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-007",
+    email: "윤도현@gather.com",
+    full_name: "윤도현",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=dohyun",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-008",
+    email: "임지민@gather.com",
+    full_name: "임지민",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=jimin",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-009",
+    email: "한예준@gather.com",
+    full_name: "한예준",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=yejun",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "user-010",
+    email: "오서준@gather.com",
+    full_name: "오서준",
+    username: null,
+    avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=seojun",
+    website: null,
+    role: "user",
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];

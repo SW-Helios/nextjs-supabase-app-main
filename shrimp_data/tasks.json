@@ -1,0 +1,320 @@
+{
+  "tasks": [
+    {
+      "id": "93844af5-6110-4683-afa8-2d6f3cf8211b",
+      "name": "프로필 기초 인프라 구축",
+      "description": "프로필 관련 쿼리 함수, 스키마 정의, 유틸리티 함수를 생성하여 기초 인프라를 구축합니다.",
+      "notes": "기존 lib/queries/events.ts와 동일한 에러 핸들링 패턴(try-catch, null 반환) 사용. Zod 스키마는 기존 이벤트 스키마와 유사한 구조 적용.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T04:53:09.408Z",
+      "relatedFiles": [
+        {
+          "path": "lib/schemas/profile.ts",
+          "type": "CREATE",
+          "description": "프로필 Zod 검증 스키마"
+        },
+        {
+          "path": "lib/queries/profile.ts",
+          "type": "CREATE",
+          "description": "프로필 쿼리 함수"
+        },
+        {
+          "path": "lib/utils/username.ts",
+          "type": "CREATE",
+          "description": "닉네임 생성 유틸리티"
+        },
+        {
+          "path": "lib/queries/events.ts",
+          "type": "REFERENCE",
+          "description": "쿼리 함수 패턴 참조"
+        },
+        {
+          "path": "lib/schemas/event.ts",
+          "type": "REFERENCE",
+          "description": "스키마 구조 참조"
+        }
+      ],
+      "implementationGuide": "**1. lib/schemas/profile.ts 생성:**\n```typescript\nimport { z } from \"zod\";\n\nexport const setupProfileSchema = z.object({\n  username: z.string().min(3, \"닉네임은 최소 3자 이상이어야 합니다\").max(20, \"닉네임은 최대 20자까지 가능합니다\").regex(/^[a-zA-Z0-9가-힣_]+$/, \"닉네임은 영문, 숫자, 한글, _만 사용 가능합니다\"),\n  full_name: z.string().optional(),\n});\n\nexport const updateProfileSchema = z.object({\n  username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9가-힣_]+$/).optional(),\n  full_name: z.string().optional(),\n  avatar_url: z.string().url(\"올바른 URL을 입력하세요\").optional().or(z.literal(\"\")),\n  website: z.string().url(\"올바른 URL을 입력하세요\").optional().or(z.literal(\"\")),\n});\n\nexport type SetupProfileInput = z.infer<typeof setupProfileSchema>;\nexport type UpdateProfileInput = z.infer<typeof updateProfileSchema>;\n```\n\n**2. lib/queries/profile.ts 생성:**\n```typescript\nimport { createClient } from \"@/lib/supabase/server\";\nimport type { User } from \"@/lib/types/models\";\n\nexport async function getUserProfile(userId: string): Promise<User | null> {\n  try {\n    const supabase = await createClient();\n    const { data, error } = await supabase.from(\"profiles\").select(\"*\").eq(\"id\", userId).single();\n    if (error || !data) return null;\n    return data;\n  } catch { return null; }\n}\n\nexport async function checkUsernameAvailability(username: string, currentUserId?: string): Promise<boolean> {\n  try {\n    const supabase = await createClient();\n    const query = supabase.from(\"profiles\").select(\"id\").eq(\"username\", username);\n    if (currentUserId) query.neq(\"id\", currentUserId);\n    const { data, error } = await query.single();\n    if (error && error.code === \"PGRST116\") return true;\n    if (error) return false;\n    return !data;\n  } catch { return false; }\n}\n```\n\n**3. lib/utils/username.ts 생성:**\n```typescript\nexport function generateUsername(fullName: string): string {\n  const baseUsername = fullName.replace(/\\s+/g, \"\");\n  const randomSuffix = Math.floor(1000 + Math.random() * 9000);\n  return `${baseUsername}${randomSuffix}`;\n}\n```",
+      "verificationCriteria": "1. lib/schemas/profile.ts 파일이 생성되고 setupProfileSchema와 updateProfileSchema가 정의됨\n2. lib/queries/profile.ts 파일이 생성되고 getUserProfile, checkUsernameAvailability 함수가 구현됨\n3. lib/utils/username.ts 파일이 생성되고 generateUsername 함수가 구현됨\n4. TypeScript 타입 체크 통과 (npm run typecheck)\n5. 기존 lib/queries/events.ts와 동일한 에러 핸들링 패턴 적용 확인",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "Task 1 완료: 프로필 기초 인프라 구축 성공\n\n**생성된 파일:**\n1. lib/schemas/profile.ts - setupProfileSchema, updateProfileSchema, 타입 정의\n2. lib/queries/profile.ts - getUserProfile, checkUsernameAvailability 쿼리 함수\n3. lib/utils/username.ts - generateUsername 유틸리티 함수\n\n**검증 완료:**\n- ✅ 3개 파일 모두 생성됨\n- ✅ Zod 스키마 정의 (닉네임 3-20자, 정규식 검증, URL 검증)\n- ✅ 쿼리 함수 에러 핸들링 패턴 (try-catch, null 반환) 기존 events.ts와 동일\n- ✅ JSDoc 한국어 주석 작성\n- ✅ TypeScript 타입 안전성 (User 타입 사용, 명시적 반환 타입)\n- ✅ Supabase 클라이언트 패턴 준수 (함수 내부에서 await createClient())\n\n기존 TypeScript 에러는 admin 페이지의 미사용 import로 새 코드와 무관함.",
+      "completedAt": "2025-10-20T04:53:09.402Z"
+    },
+    {
+      "id": "00ca9ccd-1b20-4a66-8faf-bdaa142075ab",
+      "name": "프로필 Server Actions 구현",
+      "description": "프로필 설정 및 수정을 위한 Server Actions를 구현합니다. setupProfileAction, updateProfileAction, checkUsernameAction을 생성합니다.",
+      "notes": "기존 app/actions/events.ts의 패턴(인증 확인 → Zod 검증 → DB 작업 → revalidatePath) 준수. ActionResult<T> 타입 사용.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "93844af5-6110-4683-afa8-2d6f3cf8211b"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T04:57:25.546Z",
+      "relatedFiles": [
+        {
+          "path": "app/actions/profile.ts",
+          "type": "CREATE",
+          "description": "프로필 Server Actions"
+        },
+        {
+          "path": "lib/schemas/profile.ts",
+          "type": "DEPENDENCY",
+          "description": "스키마 임포트"
+        },
+        {
+          "path": "lib/queries/profile.ts",
+          "type": "DEPENDENCY",
+          "description": "쿼리 함수 임포트"
+        },
+        {
+          "path": "app/actions/events.ts",
+          "type": "REFERENCE",
+          "description": "Server Actions 패턴 참조"
+        },
+        {
+          "path": "lib/types/forms.ts",
+          "type": "REFERENCE",
+          "description": "ActionResult 타입 참조"
+        }
+      ],
+      "implementationGuide": "**app/actions/profile.ts 생성:**\n```typescript\n\"use server\";\n\nimport { revalidatePath } from \"next/cache\";\nimport { createClient } from \"@/lib/supabase/server\";\nimport { setupProfileSchema, updateProfileSchema } from \"@/lib/schemas/profile\";\nimport { checkUsernameAvailability } from \"@/lib/queries/profile\";\nimport type { ActionResult } from \"@/lib/types/forms\";\n\nexport async function setupProfileAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {\n  try {\n    const supabase = await createClient();\n    const { data: { user }, error: authError } = await supabase.auth.getUser();\n    if (authError || !user) return { success: false, message: \"로그인이 필요합니다.\" };\n    \n    const validatedFields = setupProfileSchema.safeParse({\n      username: formData.get(\"username\"),\n      full_name: formData.get(\"full_name\") || undefined,\n    });\n    \n    if (!validatedFields.success) {\n      return {\n        success: false,\n        message: \"입력된 정보를 확인해주세요.\",\n        errors: validatedFields.error.flatten().fieldErrors,\n      };\n    }\n    \n    const isAvailable = await checkUsernameAvailability(validatedFields.data.username, user.id);\n    if (!isAvailable) {\n      return {\n        success: false,\n        message: \"이미 사용 중인 닉네임입니다.\",\n        errors: { username: [\"이미 사용 중인 닉네임입니다.\"] },\n      };\n    }\n    \n    const { error: updateError } = await supabase.from(\"profiles\").update({\n      username: validatedFields.data.username,\n      full_name: validatedFields.data.full_name,\n    }).eq(\"id\", user.id);\n    \n    if (updateError) return { success: false, message: \"프로필 설정에 실패했습니다.\" };\n    \n    revalidatePath(\"/profile\");\n    return { success: true, message: \"프로필이 설정되었습니다.\" };\n  } catch {\n    return { success: false, message: \"프로필 설정 중 오류가 발생했습니다.\" };\n  }\n}\n\nexport async function updateProfileAction(_prevState: ActionResult, formData: FormData): Promise<ActionResult> {\n  // setupProfileAction과 유사하지만 updateProfileSchema 사용\n  // avatar_url, website 필드 추가 처리\n  // revalidatePath(\"/profile\") 및 revalidatePath(\"/events\") 호출\n}\n\nexport async function checkUsernameAction(username: string): Promise<{ available: boolean }> {\n  try {\n    const supabase = await createClient();\n    const { data: { user } } = await supabase.auth.getUser();\n    const isAvailable = await checkUsernameAvailability(username, user?.id);\n    return { available: isAvailable };\n  } catch {\n    return { available: false };\n  }\n}\n```",
+      "verificationCriteria": "1. app/actions/profile.ts 파일이 생성됨\n2. setupProfileAction, updateProfileAction, checkUsernameAction 함수가 구현됨\n3. 기존 app/actions/events.ts와 동일한 패턴(인증 확인, Zod 검증, revalidatePath) 적용\n4. TypeScript 타입 체크 통과\n5. ActionResult<T> 타입 사용 확인",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "**✅ 프로필 Server Actions 구현 완료**\n\napp/actions/profile.ts 파일을 생성하고 3개의 Server Action 함수를 구현했습니다:\n\n1. **setupProfileAction** (app/actions/profile.ts:38-108)\n   - OAuth 로그인 후 최초 닉네임 설정 처리\n   - 인증 확인 → Zod 검증 → 닉네임 중복 체크 → DB 업데이트 → revalidatePath\n   - ActionResult 타입 반환, 에러 핸들링 완료\n\n2. **updateProfileAction** (app/actions/profile.ts:129-248)\n   - 프로필 수정 처리 (닉네임, 이름, 아바타, 웹사이트)\n   - 변경된 필드만 추출하여 업데이트\n   - revalidatePath(\"/profile\", \"/events\") 호출\n   - ActionResult 타입 반환\n\n3. **checkUsernameAction** (app/actions/profile.ts:267-286)\n   - 실시간 닉네임 중복 확인 (300ms 디바운스 권장)\n   - 현재 사용자는 체크에서 제외\n   - { available: boolean } 반환\n\n**검증 완료:**\n- ✅ app/actions/events.ts 패턴 준수\n- ✅ TypeScript 타입 체크 통과 (미사용 import 제거)\n- ✅ ActionResult<T> 타입 사용\n- ✅ 상세한 JSDoc 주석 추가\n- ✅ 에러 핸들링 및 사용자 피드백 메시지 포함",
+      "completedAt": "2025-10-20T04:57:25.534Z"
+    },
+    {
+      "id": "cbe2dfe6-5db7-4a01-97a3-7224dab80cc7",
+      "name": "프로필 페이지 실제 데이터 연동",
+      "description": "기존 프로필 페이지(app/(mobile)/profile/page.tsx)의 하드코딩된 더미 데이터를 제거하고 Supabase에서 실제 사용자 데이터를 조회하도록 수정합니다.",
+      "notes": "lib/data/index.ts의 더미 데이터 대신 lib/queries/profile.ts와 lib/queries/events.ts 함수 사용. 기존 UI 레이아웃과 스타일 유지.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "93844af5-6110-4683-afa8-2d6f3cf8211b"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T05:02:20.621Z",
+      "relatedFiles": [
+        {
+          "path": "app/(mobile)/profile/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "하드코딩된 데이터를 실제 Supabase 쿼리로 변경",
+          "lineStart": 14,
+          "lineEnd": 30
+        },
+        {
+          "path": "lib/queries/profile.ts",
+          "type": "DEPENDENCY",
+          "description": "getUserProfile 함수 사용"
+        },
+        {
+          "path": "lib/queries/events.ts",
+          "type": "DEPENDENCY",
+          "description": "getUserHostedEvents, getUserParticipatingEvents 함수 사용"
+        }
+      ],
+      "implementationGuide": "**app/(mobile)/profile/page.tsx 수정:**\n\n**변경 전:**\n```typescript\nexport default async function ProfilePage() {\n  const currentUserId = \"user-001\"; // Phase 2: 하드코딩\n  const user = getUserById(currentUserId);\n  const hostedEvents = getUserHostedEvents(currentUserId);\n  const participatingEvents = getUserEvents(currentUserId);\n}\n```\n\n**변경 후:**\n```typescript\nimport { createClient } from \"@/lib/supabase/server\";\nimport { getUserProfile } from \"@/lib/queries/profile\";\nimport { getUserHostedEvents, getUserParticipatingEvents } from \"@/lib/queries/events\";\nimport { redirect } from \"next/navigation\";\n\nexport default async function ProfilePage() {\n  // 인증 확인\n  const supabase = await createClient();\n  const { data: { user }, error: authError } = await supabase.auth.getUser();\n  \n  if (authError || !user) {\n    redirect(\"/auth/login\");\n  }\n  \n  // 프로필 조회\n  const profile = await getUserProfile(user.id);\n  \n  if (!profile) {\n    return (\n      <div className=\"flex h-[50vh] items-center justify-center\">\n        <p className=\"text-muted-foreground\">프로필을 찾을 수 없습니다.</p>\n      </div>\n    );\n  }\n  \n  // 통계 정보 (기존 쿼리 함수 재사용)\n  const hostedEvents = await getUserHostedEvents(user.id);\n  const participatingEvents = await getUserParticipatingEvents(user.id);\n  \n  // 기존 JSX 코드 유지 (user → profile 변수명 변경)\n  return (\n    <div className=\"space-y-6 pb-8\">\n      {/* 프로필 헤더 */}\n      <Card>\n        <CardContent className=\"pt-6\">\n          <div className=\"flex items-center gap-4\">\n            <Avatar className=\"h-20 w-20\">\n              <AvatarImage src={profile.avatar_url ?? undefined} alt={profile.full_name ?? \"\"} />\n              <AvatarFallback className=\"text-2xl\">{getInitials(profile.full_name)}</AvatarFallback>\n            </Avatar>\n            {/* ... 기존 코드 ... */}\n          </div>\n        </CardContent>\n      </Card>\n      {/* ... 나머지 기존 코드 ... */}\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. 하드코딩된 user-001 제거됨\n2. createClient()로 인증 확인 추가\n3. getUserProfile(user.id)로 프로필 조회\n4. getUserHostedEvents, getUserParticipatingEvents 함수 사용\n5. 기존 UI 레이아웃 및 스타일 유지\n6. 로그인하지 않은 사용자는 /auth/login으로 리다이렉트\n7. TypeScript 타입 체크 통과",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "**✅ 프로필 페이지 실제 데이터 연동 완료 및 Playwright 테스트 성공**\n\napp/(mobile)/profile/page.tsx를 수정하여 하드코딩된 더미 데이터를 제거하고 Supabase 실제 데이터로 변경했습니다.\n\n**구현 내용:**\n\n1. **인증 확인 추가** (app/(mobile)/profile/page.tsx:21-30)\n   - createClient()로 Supabase 클라이언트 생성\n   - supabase.auth.getUser()로 현재 사용자 확인\n   - 인증되지 않은 사용자는 /auth/login으로 리다이렉트\n\n2. **프로필 조회** (app/(mobile)/profile/page.tsx:33-41)\n   - getUserProfile(user.id)로 실제 프로필 데이터 조회\n   - 프로필이 없으면 에러 메시지 표시\n\n3. **이벤트 통계** (app/(mobile)/profile/page.tsx:44-45)\n   - getUserHostedEvents(user.id)로 호스팅한 이벤트 조회\n   - getUserParticipatingEvents(user.id)로 참여한 이벤트 조회\n\n4. **JSX 변수 변경** (app/(mobile)/profile/page.tsx:54-107)\n   - 하드코딩된 user-001 제거\n   - user → profile 변수명 변경\n   - 기존 UI 레이아웃 및 스타일 완벽 유지\n\n**Playwright 테스트 결과:**\n- ✅ 테스트 계정 로그인 성공 (gymcoding@gmail.com)\n- ✅ 프로필 페이지 접근 성공 (/profile)\n- ✅ 실제 데이터 표시 확인:\n  - 이메일: gymcoding@gmail.com\n  - 만든 이벤트: 4개\n  - 참여한 이벤트: 0개\n  - 역할: 사용자\n  - 가입일: 2025. 10. 16.\n- ✅ 스크린샷 저장: .playwright-mcp/profile-page-test.png\n- ✅ TypeScript 타입 체크 통과",
+      "completedAt": "2025-10-20T05:02:20.613Z"
+    },
+    {
+      "id": "268a00d8-1e0e-46dc-b69f-733068c1285f",
+      "name": "닉네임 설정 페이지 구현",
+      "description": "회원가입 후 닉네임을 설정하는 페이지와 폼 컴포넌트를 구현합니다. OAuth 로그인 시 자동 생성된 닉네임을 제안하는 기능 포함.",
+      "notes": "기존 components/events/event-form.tsx의 폼 구조(React Hook Form + useActionState) 참조. OAuth user_metadata에서 full_name 추출.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "93844af5-6110-4683-afa8-2d6f3cf8211b"
+        },
+        {
+          "taskId": "00ca9ccd-1b20-4a66-8faf-bdaa142075ab"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T05:09:47.707Z",
+      "relatedFiles": [
+        {
+          "path": "components/setup-profile-form.tsx",
+          "type": "CREATE",
+          "description": "닉네임 설정 폼 컴포넌트"
+        },
+        {
+          "path": "app/auth/setup-profile/page.tsx",
+          "type": "CREATE",
+          "description": "닉네임 설정 페이지"
+        },
+        {
+          "path": "lib/utils/username.ts",
+          "type": "DEPENDENCY",
+          "description": "generateUsername 함수 사용"
+        },
+        {
+          "path": "app/actions/profile.ts",
+          "type": "DEPENDENCY",
+          "description": "setupProfileAction 사용"
+        },
+        {
+          "path": "components/events/event-form.tsx",
+          "type": "REFERENCE",
+          "description": "폼 구조 참조"
+        }
+      ],
+      "implementationGuide": "**1. components/setup-profile-form.tsx 생성 (Client Component):**\n```typescript\n\"use client\";\n\nimport { useActionState } from \"react\";\nimport { useForm } from \"react-hook-form\";\nimport { zodResolver } from \"@hookform/resolvers/zod\";\nimport { setupProfileSchema, type SetupProfileInput } from \"@/lib/schemas/profile\";\nimport { setupProfileAction } from \"@/app/actions/profile\";\nimport { Button } from \"@/components/ui/button\";\nimport { Input } from \"@/components/ui/input\";\nimport { Label } from \"@/components/ui/label\";\nimport { showSuccess, showError } from \"@/lib/utils/toast\";\nimport { useRouter } from \"next/navigation\";\nimport { useEffect } from \"react\";\n\ninterface SetupProfileFormProps {\n  suggestedUsername: string;\n  redirectPath: string;\n}\n\nexport function SetupProfileForm({ suggestedUsername, redirectPath }: SetupProfileFormProps) {\n  const router = useRouter();\n  const [state, formAction] = useActionState(setupProfileAction, { success: false, message: \"\" });\n  \n  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SetupProfileInput>({\n    resolver: zodResolver(setupProfileSchema),\n    defaultValues: { username: suggestedUsername },\n  });\n  \n  useEffect(() => {\n    if (state.success) {\n      showSuccess(state.message);\n      router.push(redirectPath);\n    } else if (state.message) {\n      showError(state.message);\n    }\n  }, [state, router, redirectPath]);\n  \n  return (\n    <form action={formAction}>\n      <div className=\"space-y-4\">\n        <div>\n          <Label htmlFor=\"username\">닉네임</Label>\n          <Input id=\"username\" {...register(\"username\")} />\n          {errors.username && <p className=\"text-sm text-red-500\">{errors.username.message}</p>}\n        </div>\n        <div>\n          <Label htmlFor=\"full_name\">전체 이름 (선택)</Label>\n          <Input id=\"full_name\" {...register(\"full_name\")} />\n        </div>\n        <Button type=\"submit\" className=\"w-full\" disabled={isSubmitting}>\n          {isSubmitting ? \"설정 중...\" : \"완료\"}\n        </Button>\n      </div>\n    </form>\n  );\n}\n```\n\n**2. app/auth/setup-profile/page.tsx 생성 (Server Component):**\n```typescript\nimport { createClient } from \"@/lib/supabase/server\";\nimport { redirect } from \"next/navigation\";\nimport { SetupProfileForm } from \"@/components/setup-profile-form\";\nimport { generateUsername } from \"@/lib/utils/username\";\nimport { Card, CardContent, CardHeader, CardTitle } from \"@/components/ui/card\";\n\nexport default async function SetupProfilePage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {\n  const { next = \"/\" } = await searchParams;\n  \n  const supabase = await createClient();\n  const { data: { user }, error: authError } = await supabase.auth.getUser();\n  \n  if (authError || !user) redirect(\"/auth/login\");\n  \n  // 이미 닉네임이 있으면 리다이렉트\n  const { data: profile } = await supabase.from(\"profiles\").select(\"username\").eq(\"id\", user.id).single();\n  if (profile?.username) redirect(next);\n  \n  // OAuth 메타데이터에서 full_name 추출하여 닉네임 제안\n  const fullName = user.user_metadata?.full_name || \"사용자\";\n  const suggestedUsername = generateUsername(fullName);\n  \n  return (\n    <div className=\"flex min-h-svh items-center justify-center p-6\">\n      <Card className=\"w-full max-w-md\">\n        <CardHeader>\n          <CardTitle>프로필 설정</CardTitle>\n          <p className=\"text-sm text-muted-foreground\">닉네임을 설정해주세요</p>\n        </CardHeader>\n        <CardContent>\n          <SetupProfileForm suggestedUsername={suggestedUsername} redirectPath={next} />\n        </CardContent>\n      </Card>\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. components/setup-profile-form.tsx 생성 및 React Hook Form + useActionState 적용\n2. app/auth/setup-profile/page.tsx 생성 및 인증 확인\n3. OAuth user_metadata에서 full_name 추출하여 닉네임 제안\n4. 이미 닉네임이 있으면 next 경로로 리다이렉트\n5. 폼 제출 성공 시 Toast 알림 및 next 경로로 이동\n6. TypeScript 타입 체크 통과",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "**✅ 닉네임 설정 페이지 구현 완료 및 Playwright 테스트 성공**\n\nOAuth 로그인 후 닉네임을 설정하는 페이지와 폼 컴포넌트를 성공적으로 구현했습니다.\n\n**구현 내용:**\n\n1. **components/setup-profile-form.tsx 생성**\n   - React Hook Form + Zod 검증 적용\n   - shadcn/ui Form 컴포넌트 사용\n   - setupProfileAction Server Action 연동\n   - 성공 시 Toast 알림 및 리다이렉트 처리\n   - 에러 시 필드별 에러 메시지 표시\n   - 로딩 상태 처리 (Loader2 아이콘)\n\n2. **app/auth/setup-profile/page.tsx 생성**\n   - 인증 확인 (미인증 시 /auth/login 리다이렉트)\n   - 기존 닉네임 확인 (있으면 next 경로로 리다이렉트)\n   - OAuth user_metadata에서 full_name 추출\n   - generateUsername()로 자동 닉네임 생성\n   - 제안된 닉네임을 폼에 기본값으로 전달\n\n**Playwright 테스트 결과:**\n\n✅ **페이지 접근 테스트**\n- /auth/setup-profile 페이지 로드 성공\n- OAuth 메타데이터 기반 자동 생성 닉네임 표시: \"사용자3086\"\n- 폼 구조 및 UI 정상 렌더링\n\n✅ **프로필 설정 테스트**\n- 닉네임 수정: \"사용자3086\" → \"gymcoding123\"\n- 전체 이름 입력: \"짐코딩\"\n- 폼 제출 성공\n- \"프로필이 설정되었습니다.\" 성공 메시지 표시\n- 홈페이지(/)로 자동 리다이렉트\n\n✅ **데이터 저장 확인**\n- 프로필 페이지 접근\n- 아바타: \"짐코\" (이름의 앞 두 글자 이니셜)\n- 이름: \"짐코딩\" 정상 표시\n- 이메일: gymcoding@gmail.com\n- 통계: 만든 이벤트 4개, 참여한 이벤트 0개\n\n**스크린샷:**\n- .playwright-mcp/setup-profile-page-initial.png (초기 페이지)\n- .playwright-mcp/profile-page-after-setup.png (설정 후 프로필)\n\n**기술적 특징:**\n- ✅ React Hook Form 패턴 (기존 EventForm 구조 준수)\n- ✅ TypeScript 타입 체크 통과\n- ✅ OAuth 자동 닉네임 생성 기능\n- ✅ 사용자 친화적 UI/UX (설명 텍스트, 로딩 상태)\n- ✅ 에러 핸들링 완벽 구현",
+      "completedAt": "2025-10-20T05:09:47.699Z"
+    },
+    {
+      "id": "cd26f0c9-1fca-4897-90d1-3f01c8e525ca",
+      "name": "OAuth 콜백 핸들러에 닉네임 확인 로직 추가",
+      "description": "OAuth 로그인 후 콜백 처리 시 사용자의 닉네임 설정 여부를 확인하고, 없으면 닉네임 설정 페이지로 리다이렉트합니다.",
+      "notes": "기존 리다이렉트 로직을 유지하면서 닉네임 확인 로직만 추가. next 파라미터는 encodeURIComponent로 인코딩.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "268a00d8-1e0e-46dc-b69f-733068c1285f"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T05:12:46.547Z",
+      "relatedFiles": [
+        {
+          "path": "app/auth/callback/route.ts",
+          "type": "TO_MODIFY",
+          "description": "OAuth 콜백 핸들러에 닉네임 확인 로직 추가",
+          "lineStart": 17,
+          "lineEnd": 30
+        }
+      ],
+      "implementationGuide": "**app/auth/callback/route.ts 수정:**\n\n**기존 코드 (17-30행):**\n```typescript\nif (!error) {\n  const forwardedHost = request.headers.get(\"x-forwarded-host\");\n  const isLocalEnv = process.env.NODE_ENV === \"development\";\n\n  if (isLocalEnv) {\n    return NextResponse.redirect(`${origin}${next}`);\n  } else if (forwardedHost) {\n    return NextResponse.redirect(`https://${forwardedHost}${next}`);\n  } else {\n    return NextResponse.redirect(`${origin}${next}`);\n  }\n}\n```\n\n**수정 후:**\n```typescript\nif (!error) {\n  // 사용자 프로필 조회하여 닉네임 확인\n  const { data: { user } } = await supabase.auth.getUser();\n  \n  if (user) {\n    const { data: profile } = await supabase\n      .from(\"profiles\")\n      .select(\"username\")\n      .eq(\"id\", user.id)\n      .single();\n    \n    // 닉네임이 없으면 설정 페이지로 리다이렉트 (next 파라미터 보존)\n    if (!profile?.username) {\n      const forwardedHost = request.headers.get(\"x-forwarded-host\");\n      const isLocalEnv = process.env.NODE_ENV === \"development\";\n      const setupUrl = `/auth/setup-profile?next=${encodeURIComponent(next)}`;\n      \n      if (isLocalEnv) {\n        return NextResponse.redirect(`${origin}${setupUrl}`);\n      } else if (forwardedHost) {\n        return NextResponse.redirect(`https://${forwardedHost}${setupUrl}`);\n      } else {\n        return NextResponse.redirect(`${origin}${setupUrl}`);\n      }\n    }\n  }\n  \n  // 닉네임이 있으면 원래 페이지로 리다이렉트 (기존 로직)\n  const forwardedHost = request.headers.get(\"x-forwarded-host\");\n  const isLocalEnv = process.env.NODE_ENV === \"development\";\n\n  if (isLocalEnv) {\n    return NextResponse.redirect(`${origin}${next}`);\n  } else if (forwardedHost) {\n    return NextResponse.redirect(`https://${forwardedHost}${next}`);\n  } else {\n    return NextResponse.redirect(`${origin}${next}`);\n  }\n}\n```",
+      "verificationCriteria": "1. OAuth 인증 성공 후 사용자 프로필 조회\n2. username이 null이면 /auth/setup-profile?next=원본경로 로 리다이렉트\n3. username이 있으면 기존 로직대로 원본 경로로 리다이렉트\n4. next 파라미터 올바르게 인코딩 및 전달\n5. 로컬/프로덕션 환경 분기 로직 유지\n6. TypeScript 타입 체크 통과",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "**✅ OAuth 콜백 핸들러에 닉네임 확인 로직 추가 완료**\n\nOAuth 로그인 후 콜백 처리 시 사용자의 닉네임 설정 여부를 확인하고, 없으면 닉네임 설정 페이지로 리다이렉트하는 로직을 성공적으로 구현했습니다.\n\n**구현 내용:**\n\napp/auth/callback/route.ts 수정 (19-59행):\n\n1. **인증 성공 후 사용자 프로필 조회** (21-30행)\n   - supabase.auth.getUser()로 현재 사용자 확인\n   - profiles 테이블에서 username 필드 조회\n\n2. **닉네임 확인 로직** (32-46행)\n   - username이 null이면 /auth/setup-profile?next={원본경로} 로 리다이렉트\n   - encodeURIComponent()로 next 파라미터 인코딩\n   - 로컬/프로덕션 환경 분기 로직 유지\n\n3. **기존 로직 유지** (48-58행)\n   - username이 있으면 원래 next 경로로 리다이렉트\n   - forwardedHost 처리 및 환경별 분기 로직 보존\n\n**로직 흐름:**\n```\nOAuth 인증 성공\n  ↓\n사용자 프로필 조회\n  ↓\nusername 있음? \n  ├─ YES → next 경로로 리다이렉트 (기존 동작)\n  └─ NO  → /auth/setup-profile?next={원본경로}로 리다이렉트\n```\n\n**기술적 특징:**\n- ✅ 기존 리다이렉트 로직 완전 보존\n- ✅ next 파라미터 올바르게 인코딩 및 전달\n- ✅ 로컬/프로덕션 환경 분기 처리\n- ✅ TypeScript 타입 체크 통과\n- ✅ 에러 핸들링 로직 변경 없음\n\n**통합 효과:**\n이제 OAuth 로그인 시 다음과 같이 자동으로 동작합니다:\n1. Google 로그인 → OAuth 콜백\n2. 닉네임 미설정 → 자동으로 /auth/setup-profile 이동\n3. 닉네임 설정 완료 → 원래 가려던 페이지로 이동",
+      "completedAt": "2025-10-20T05:12:46.537Z"
+    },
+    {
+      "id": "89e05d7f-ae39-4424-8c76-3d05051610b0",
+      "name": "프로필 수정 페이지 구현",
+      "description": "사용자가 프로필 정보(닉네임, 이름, 아바타, 웹사이트)를 수정할 수 있는 페이지와 폼 컴포넌트를 구현합니다.",
+      "notes": "닉네임 중복 확인은 use-debounce로 300ms debounce 적용. 기존 이벤트 수정 페이지 레이아웃 참조. npm install use-debounce 필요.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "93844af5-6110-4683-afa8-2d6f3cf8211b"
+        },
+        {
+          "taskId": "00ca9ccd-1b20-4a66-8faf-bdaa142075ab"
+        },
+        {
+          "taskId": "cbe2dfe6-5db7-4a01-97a3-7224dab80cc7"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T05:37:50.528Z",
+      "relatedFiles": [
+        {
+          "path": "components/profile-edit-form.tsx",
+          "type": "CREATE",
+          "description": "프로필 수정 폼 컴포넌트"
+        },
+        {
+          "path": "app/(mobile)/profile/edit/page.tsx",
+          "type": "CREATE",
+          "description": "프로필 수정 페이지"
+        },
+        {
+          "path": "app/(mobile)/profile/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "프로필 수정 버튼 추가",
+          "lineStart": 92,
+          "lineEnd": 92
+        },
+        {
+          "path": "app/actions/profile.ts",
+          "type": "DEPENDENCY",
+          "description": "updateProfileAction, checkUsernameAction 사용"
+        },
+        {
+          "path": "app/(mobile)/events/[id]/edit/page.tsx",
+          "type": "REFERENCE",
+          "description": "수정 페이지 레이아웃 참조"
+        }
+      ],
+      "implementationGuide": "**1. components/profile-edit-form.tsx 생성 (Client Component):**\n```typescript\n\"use client\";\n\nimport { useActionState } from \"react\";\nimport { useForm } from \"react-hook-form\";\nimport { zodResolver } from \"@hookform/resolvers/zod\";\nimport { updateProfileSchema, type UpdateProfileInput } from \"@/lib/schemas/profile\";\nimport { updateProfileAction, checkUsernameAction } from \"@/app/actions/profile\";\nimport { Button } from \"@/components/ui/button\";\nimport { Input } from \"@/components/ui/input\";\nimport { Label } from \"@/components/ui/label\";\nimport { Card, CardContent } from \"@/components/ui/card\";\nimport { showSuccess, showError } from \"@/lib/utils/toast\";\nimport { useRouter } from \"next/navigation\";\nimport { useEffect, useState } from \"react\";\nimport { useDebouncedCallback } from \"use-debounce\"; // npm install use-debounce 필요\nimport type { User } from \"@/lib/types/models\";\n\ninterface ProfileEditFormProps {\n  profile: User;\n}\n\nexport function ProfileEditForm({ profile }: ProfileEditFormProps) {\n  const router = useRouter();\n  const [state, formAction] = useActionState(updateProfileAction, { success: false, message: \"\" });\n  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);\n  \n  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<UpdateProfileInput>({\n    resolver: zodResolver(updateProfileSchema),\n    defaultValues: {\n      username: profile.username || undefined,\n      full_name: profile.full_name || undefined,\n      avatar_url: profile.avatar_url || \"\",\n      website: profile.website || \"\",\n    },\n  });\n  \n  const watchedUsername = watch(\"username\");\n  \n  // 닉네임 중복 확인 (300ms debounce)\n  const checkUsername = useDebouncedCallback(async (username: string) => {\n    if (!username || username === profile.username) {\n      setUsernameAvailable(null);\n      return;\n    }\n    const { available } = await checkUsernameAction(username);\n    setUsernameAvailable(available);\n  }, 300);\n  \n  useEffect(() => {\n    if (watchedUsername) checkUsername(watchedUsername);\n  }, [watchedUsername, checkUsername]);\n  \n  useEffect(() => {\n    if (state.success) {\n      showSuccess(state.message);\n      router.push(\"/profile\");\n    } else if (state.message) {\n      showError(state.message);\n    }\n  }, [state, router]);\n  \n  return (\n    <form action={formAction}>\n      <Card>\n        <CardContent className=\"space-y-4 pt-6\">\n          <div>\n            <Label htmlFor=\"username\">닉네임</Label>\n            <Input id=\"username\" {...register(\"username\")} />\n            {errors.username && <p className=\"text-sm text-red-500\">{errors.username.message}</p>}\n            {usernameAvailable === false && <p className=\"text-sm text-red-500\">이미 사용 중인 닉네임입니다</p>}\n            {usernameAvailable === true && <p className=\"text-sm text-green-500\">사용 가능한 닉네임입니다</p>}\n          </div>\n          <div>\n            <Label htmlFor=\"full_name\">전체 이름</Label>\n            <Input id=\"full_name\" {...register(\"full_name\")} />\n          </div>\n          <div>\n            <Label htmlFor=\"avatar_url\">아바타 URL</Label>\n            <Input id=\"avatar_url\" {...register(\"avatar_url\")} placeholder=\"https://example.com/avatar.jpg\" />\n            {errors.avatar_url && <p className=\"text-sm text-red-500\">{errors.avatar_url.message}</p>}\n          </div>\n          <div>\n            <Label htmlFor=\"website\">웹사이트</Label>\n            <Input id=\"website\" {...register(\"website\")} placeholder=\"https://example.com\" />\n            {errors.website && <p className=\"text-sm text-red-500\">{errors.website.message}</p>}\n          </div>\n          <Button type=\"submit\" className=\"w-full\" disabled={isSubmitting || usernameAvailable === false}>\n            {isSubmitting ? \"저장 중...\" : \"저장\"}\n          </Button>\n        </CardContent>\n      </Card>\n    </form>\n  );\n}\n```\n\n**2. app/(mobile)/profile/edit/page.tsx 생성 (Server Component):**\n```typescript\nimport { createClient } from \"@/lib/supabase/server\";\nimport { getUserProfile } from \"@/lib/queries/profile\";\nimport { redirect, notFound } from \"next/navigation\";\nimport { ProfileEditForm } from \"@/components/profile-edit-form\";\nimport { Button } from \"@/components/ui/button\";\nimport { ArrowLeft } from \"lucide-react\";\nimport Link from \"next/link\";\n\nexport default async function EditProfilePage() {\n  const supabase = await createClient();\n  const { data: { user }, error: authError } = await supabase.auth.getUser();\n  \n  if (authError || !user) redirect(\"/auth/login\");\n  \n  const profile = await getUserProfile(user.id);\n  \n  if (!profile) notFound();\n  \n  return (\n    <div className=\"space-y-6 pb-8\">\n      <div className=\"flex items-center gap-4\">\n        <Link href=\"/profile\">\n          <Button variant=\"ghost\" size=\"icon\">\n            <ArrowLeft className=\"h-5 w-5\" />\n          </Button>\n        </Link>\n        <div>\n          <h1 className=\"text-2xl font-bold\">프로필 수정</h1>\n          <p className=\"text-muted-foreground text-sm\">프로필 정보를 수정하세요</p>\n        </div>\n      </div>\n      <ProfileEditForm profile={profile} />\n    </div>\n  );\n}\n```\n\n**3. app/(mobile)/profile/page.tsx에 수정 버튼 추가:**\n```typescript\n// 로그아웃 버튼 카드 앞에 추가\n<Card>\n  <CardContent className=\"pt-6\">\n    <Link href=\"/profile/edit\">\n      <Button variant=\"outline\" className=\"w-full\" size=\"lg\">\n        <Settings className=\"mr-2 h-5 w-5\" />\n        프로필 수정\n      </Button>\n    </Link>\n  </CardContent>\n</Card>\n```",
+      "verificationCriteria": "1. components/profile-edit-form.tsx 생성 및 React Hook Form + 300ms debounce 적용\n2. app/(mobile)/profile/edit/page.tsx 생성 및 인증 확인\n3. 닉네임 중복 확인 실시간 피드백\n4. 폼 제출 성공 시 Toast 알림 및 /profile로 리다이렉트\n5. app/(mobile)/profile/page.tsx에 프로필 수정 버튼 추가\n6. use-debounce 패키지 설치 확인\n7. TypeScript 타입 체크 통과",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃",
+      "summary": "**✅ 프로필 수정 페이지 구현 완료 및 Playwright 테스트 성공**\n\n사용자가 프로필 정보를 수정할 수 있는 페이지와 폼 컴포넌트를 성공적으로 구현했습니다. 닉네임 중복 확인 기능(300ms debounce)을 포함합니다.\n\n**구현 내용:**\n\n1. **use-debounce 패키지 설치**\n   - npm install use-debounce 성공\n\n2. **components/profile-edit-form.tsx 생성**\n   - React Hook Form + Zod 검증\n   - 300ms debounce 닉네임 중복 확인\n   - useDebouncedCallback으로 checkUsernameAction 호출\n   - 실시간 사용 가능 여부 피드백 (빨강/초록 메시지)\n   - 기본값으로 현재 프로필 데이터 채우기\n   - 성공 시 Toast 알림 + /profile 리다이렉트\n   - 로딩 상태 처리 (Loader2 아이콘)\n\n3. **app/(mobile)/profile/edit/page.tsx 생성**\n   - 인증 확인 (미인증 시 /auth/login 리다이렉트)\n   - 프로필 조회 (없으면 404)\n   - ArrowLeft 뒤로가기 버튼\n   - 헤더 + 폼 레이아웃\n\n4. **app/(mobile)/profile/page.tsx 수정**\n   - Link, Settings 아이콘 import 추가\n   - 로그아웃 버튼 앞에 \"프로필 수정\" 버튼 추가\n   - Settings 아이콘 + outline 스타일\n\n**Playwright 테스트 결과:**\n\n✅ **페이지 접근 테스트**\n- 로그인 성공 (gymcoding@gmail.com)\n- 프로필 페이지 접근\n- \"프로필 수정\" 버튼 정상 표시\n\n✅ **프로필 수정 페이지 로드**\n- /profile/edit 접근 성공\n- 기본값 미리 채워짐:\n  - 닉네임: gymcoding123\n  - 전체 이름: 짐코딩\n  - 아바타 URL: (비어있음)\n  - 웹사이트: (비어있음)\n\n✅ **프로필 수정 테스트**\n- 전체 이름 변경: \"짐코딩\" → \"김민준\"\n- 웹사이트 추가: \"https://github.com/gymcoding\"\n- 폼 제출 성공\n- \"프로필이 수정되었습니다.\" 성공 메시지\n- /profile로 자동 리다이렉트\n\n✅ **데이터 저장 확인**\n- 프로필 수정 페이지 재접근\n- 전체 이름: \"김민준\" 저장 확인\n- 웹사이트: \"https://github.com/gymcoding\" 저장 확인\n\n**스크린샷:**\n- .playwright-mcp/profile-edit-page.png (수정 페이지)\n- .playwright-mcp/profile-page-after-edit.png (수정 후 프로필)\n\n**기술적 특징:**\n- ✅ use-debounce로 300ms 닉네임 중복 확인\n- ✅ 실시간 사용 가능 여부 피드백\n- ✅ 중복 닉네임 시 저장 버튼 비활성화\n- ✅ TypeScript 타입 체크 통과\n- ✅ 기존 EventForm 패턴 재사용\n- ✅ 완벽한 에러 핸들링",
+      "completedAt": "2025-10-20T05:37:50.519Z"
+    },
+    {
+      "id": "b80975d2-f10a-45c0-85d5-367fe288d59a",
+      "name": "통합 테스트 및 검증",
+      "description": "전체 프로필 관련 기능이 올바르게 동작하는지 통합 테스트를 수행하고 코드 품질을 검증합니다.",
+      "notes": "모든 코드 품질 검사 통과 필수. shrimp-rules.md의 모든 규칙 준수 확인. Playwright MCP로 E2E 테스트 권장.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "93844af5-6110-4683-afa8-2d6f3cf8211b"
+        },
+        {
+          "taskId": "00ca9ccd-1b20-4a66-8faf-bdaa142075ab"
+        },
+        {
+          "taskId": "cbe2dfe6-5db7-4a01-97a3-7224dab80cc7"
+        },
+        {
+          "taskId": "268a00d8-1e0e-46dc-b69f-733068c1285f"
+        },
+        {
+          "taskId": "cd26f0c9-1fca-4897-90d1-3f01c8e525ca"
+        },
+        {
+          "taskId": "89e05d7f-ae39-4424-8c76-3d05051610b0"
+        }
+      ],
+      "createdAt": "2025-10-20T04:48:51.413Z",
+      "updatedAt": "2025-10-20T04:48:51.413Z",
+      "relatedFiles": [
+        {
+          "path": "app/auth/callback/route.ts",
+          "type": "OTHER",
+          "description": "OAuth 플로우 테스트"
+        },
+        {
+          "path": "app/auth/setup-profile/page.tsx",
+          "type": "OTHER",
+          "description": "닉네임 설정 테스트"
+        },
+        {
+          "path": "app/(mobile)/profile/page.tsx",
+          "type": "OTHER",
+          "description": "프로필 표시 테스트"
+        },
+        {
+          "path": "app/(mobile)/profile/edit/page.tsx",
+          "type": "OTHER",
+          "description": "프로필 수정 테스트"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "프로젝트 규칙 준수 확인"
+        }
+      ],
+      "implementationGuide": "**1. OAuth 로그인 플로우 테스트:**\n- Google OAuth 로그인 시도\n- 신규 사용자: 닉네임 설정 페이지로 리다이렉트 확인\n- 닉네임 설정 후 원래 경로로 이동 확인\n- 기존 사용자(닉네임 있음): 바로 원래 경로로 이동 확인\n\n**2. 프로필 페이지 테스트:**\n- 실제 Supabase 데이터 표시 확인\n- 만든 이벤트 수, 참여한 이벤트 수 정확성 확인\n- 계정 정보(역할, 가입일) 표시 확인\n\n**3. 프로필 수정 테스트:**\n- 닉네임 중복 확인 실시간 피드백 동작 확인\n- 유효하지 않은 URL 입력 시 Zod 검증 에러 표시 확인\n- 프로필 수정 성공 시 Toast 알림 및 /profile로 리다이렉트 확인\n- revalidatePath로 캐시 갱신 확인 (프로필 페이지 새로고침 없이 변경사항 반영)\n\n**4. 코드 품질 검증:**\n```bash\nnpm run typecheck  # TypeScript 타입 체크\nnpm run lint       # ESLint 검사\nnpm run format:check  # Prettier 검사\nnpm run check-all  # 통합 검사\nnpm run build      # 프로덕션 빌드\n```\n\n**5. 프로젝트 규칙 준수 확인:**\n- Supabase 클라이언트 사용: Server Components에서 await createClient() (함수 내부)\n- 경로 별칭: 모든 import에 @/* 사용\n- 파일명: kebab-case 적용\n- 주석: 한국어 JSDoc 작성\n- 타입 안전성: any 타입 미사용, 명시적 타입 정의\n\n**6. 엣지 케이스 테스트:**\n- 닉네임이 없는 기존 사용자의 OAuth 로그인\n- 이미 사용 중인 닉네임 입력\n- 최소/최대 길이 초과 닉네임\n- 유효하지 않은 URL 형식\n- 네트워크 오류 시 에러 처리",
+      "verificationCriteria": "1. OAuth 로그인 플로우 정상 동작 (신규/기존 사용자)\n2. 프로필 페이지에 실제 데이터 표시\n3. 닉네임 중복 확인 실시간 피드백 동작\n4. 프로필 수정 성공 및 캐시 갱신 확인\n5. npm run typecheck 통과\n6. npm run lint 통과\n7. npm run format:check 통과\n8. npm run build 성공\n9. shrimp-rules.md의 모든 규칙 준수\n10. 엣지 케이스 정상 처리",
+      "analysisResult": "사용자 프로필 개선 작업 - 회원가입 후 닉네임 설정, 실제 데이터 표시, 프로필 수정 기능 구현\n\n**프로젝트 아키텍처 패턴:**\n- Server Components: lib/supabase/server.ts > createClient() 사용\n- Client Components: lib/supabase/client.ts > createClient() 사용  \n- Server Actions: \"use server\" + ActionResult<T> 반환 패턴\n- 쿼리 함수: lib/queries/*.ts (에러 시 null/빈 배열 반환)\n- 폼 검증: React Hook Form + Zod resolver\n- UI 컴포넌트: shadcn/ui (new-york 스타일)\n\n**재사용 가능한 기존 패턴:**\n- app/actions/events.ts의 Server Actions 패턴\n- components/events/event-form.tsx의 폼 컴포넌트 구조\n- lib/queries/events.ts의 쿼리 함수 에러 핸들링\n- app/(mobile)/events/[id]/edit/page.tsx의 수정 페이지 레이아웃"
+    }
+  ]
+}

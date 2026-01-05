@@ -1,0 +1,364 @@
+{
+  "tasks": [
+    {
+      "id": "519d19e2-3dd7-4112-ba6a-db4096c7ba58",
+      "name": "패키지 설치 및 공통 유틸리티 리팩토링",
+      "description": "Recharts와 shadcn/ui Table 컴포넌트를 설치하고, 날짜 포맷팅 및 이니셜 추출 유틸리티를 lib/utils/format.ts로 이동하여 전역에서 재사용 가능하도록 리팩토링합니다. 기존 EventCard 컴포넌트도 새 유틸리티 함수를 사용하도록 수정합니다.",
+      "notes": "EventCard는 이미 프로젝트에서 사용 중이므로 리팩토링 후 기존 페이지들이 정상 작동하는지 반드시 확인해야 합니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:36:00.111Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "Recharts 의존성 추가"
+        },
+        {
+          "path": "lib/utils/format.ts",
+          "type": "CREATE",
+          "description": "새로 생성할 유틸리티 파일"
+        },
+        {
+          "path": "components/events/event-card.tsx",
+          "type": "TO_MODIFY",
+          "description": "유틸리티 함수를 외부 import로 교체"
+        },
+        {
+          "path": "components/ui/table.tsx",
+          "type": "CREATE",
+          "description": "shadcn/ui로 자동 생성됨"
+        }
+      ],
+      "implementationGuide": "1. 패키지 설치:\\n   npm install recharts\\n   npx shadcn@latest add table\\n\\n2. lib/utils/format.ts 파일 생성 및 유틸리티 함수 추가:\\n   - formatDate(dateString, options?): 날짜를 한국어 형식으로 포맷\\n   - formatDateShort(dateString): 짧은 날짜 형식 (YYYY-MM-DD)\\n   - getInitials(name): 이름에서 이니셜 추출\\n\\n3. components/events/event-card.tsx 리팩토링:\\n   - 기존 내부 formatDate, getInitials 함수 제거\\n   - @/lib/utils/format에서 import하여 사용\\n\\n4. 검증:\\n   - EventCard가 정상 작동하는지 확인\\n   - npm run typecheck 실행",
+      "verificationCriteria": "1. Recharts 패키지가 package.json에 추가됨\\n2. components/ui/table.tsx 파일이 생성됨\\n3. lib/utils/format.ts 파일이 생성되고 3개 함수 export됨\\n4. EventCard가 새 유틸리티 함수를 사용하도록 수정됨\\n5. 기존 페이지들 (이벤트 목록 등)이 정상 작동함\\n6. npm run typecheck 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 1 완료: 모든 요구사항 충족\n\n**완료 항목:**\n1. ✅ Recharts 패키지 설치 완료 (v3.2.1)\n2. ✅ shadcn/ui Table 컴포넌트 생성 완료 (components/ui/table.tsx)\n3. ✅ lib/utils/format.ts에 3개 유틸리티 함수 구현:\n   - formatDate: 한국어 형식 날짜 포맷팅\n   - formatDateShort: YYYY-MM-DD 형식 포맷팅 (신규 추가)\n   - getInitials: 이니셜 추출\n4. ✅ EventCard 컴포넌트 리팩토링:\n   - 내부 formatDate, getInitials 함수 제거\n   - @/lib/utils/format에서 import하여 사용\n5. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- 모든 함수에 JSDoc 주석 및 예제 포함\n- 한글 주석, 영어 변수명 규칙 준수\n- 기존 EventCard 컴포넌트 정상 작동 보장",
+      "completedAt": "2025-10-14T08:36:00.109Z"
+    },
+    {
+      "id": "b9f45d07-f5e9-4200-b77a-af9ff9d65080",
+      "name": "관리자 더미 데이터 생성",
+      "description": "관리자 페이지에서 사용할 더미 데이터를 lib/data/admin.ts에 생성합니다. 대시보드 KPI 지표, 차트용 시계열 데이터, 이벤트/사용자 테이블 확장 데이터를 포함합니다.",
+      "notes": "lib/types/admin.ts에 이미 필요한 타입들이 정의되어 있으므로 해당 타입을 import하여 사용합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:37:12.003Z",
+      "relatedFiles": [
+        {
+          "path": "lib/data/admin.ts",
+          "type": "CREATE",
+          "description": "관리자 더미 데이터 파일"
+        },
+        {
+          "path": "lib/data/index.ts",
+          "type": "TO_MODIFY",
+          "description": "admin export 추가"
+        },
+        {
+          "path": "lib/types/admin.ts",
+          "type": "REFERENCE",
+          "description": "이미 정의된 타입 참조"
+        },
+        {
+          "path": "lib/data/events.ts",
+          "type": "REFERENCE",
+          "description": "기존 이벤트 데이터 참조"
+        },
+        {
+          "path": "lib/data/users.ts",
+          "type": "REFERENCE",
+          "description": "기존 사용자 데이터 참조"
+        }
+      ],
+      "implementationGuide": "1. lib/data/admin.ts 파일 생성\\n\\n2. DashboardMetrics 더미 데이터 생성:\\n   - totalEvents: 20 (기존 dummyEvents 개수)\\n   - totalUsers: 10\\n   - ongoingEvents: 5\\n   - todayEvents: 2\\n   - weekEvents: 5\\n   - monthEvents: 10\\n   - avgParticipants: 8\\n\\n3. 차트용 시계열 데이터 생성 (30일치):\\n   - eventTrendData: ChartDataPoint[] (일별 이벤트 생성 수)\\n   - userTrendData: ChartDataPoint[] (일별 사용자 가입 수)\\n   - eventStatusData: { name: string; value: number }[] (상태별 분포)\\n   - topEventsData: { name: string; participants: number }[] (TOP 5)\\n\\n4. 테이블 확장 데이터 생성:\\n   - getEventTableRows(): EventTableRow[] 함수\\n     - dummyEvents + host_name + participant_count 추가\\n   - getUserTableRows(): UserTableRow[] 함수\\n     - dummyUsers + created_events_count + participated_events_count 추가\\n\\n5. lib/data/index.ts에 export 추가:\\n   export * from './admin';",
+      "verificationCriteria": "1. lib/data/admin.ts 파일이 생성됨\\n2. DashboardMetrics 객체가 export됨\\n3. 4가지 차트 데이터가 export됨 (event/user trend, status, top events)\\n4. getEventTableRows(), getUserTableRows() 함수가 export됨\\n5. lib/data/index.ts에서 admin 모듈 export됨\\n6. npm run typecheck 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 2 완료: 관리자 더미 데이터 생성 완료\n\n**완료 항목:**\n1. ✅ lib/data/admin.ts 파일 생성 완료\n2. ✅ DashboardMetrics 객체 export (8개 지표)\n3. ✅ 4가지 차트 데이터 export:\n   - eventTrendData: 30일 시계열 데이터\n   - userTrendData: 30일 시계열 데이터\n   - eventStatusData: 상태별 분포 (예정/진행중/종료)\n   - topEventsData: 인기 이벤트 TOP 5\n4. ✅ 테이블 함수 구현:\n   - getEventTableRows(): EventTableRow[] (호스트명, 참여자수 포함)\n   - getUserTableRows(): UserTableRow[] (이벤트 생성/참여 수 포함)\n5. ✅ lib/data/index.ts에서 admin 모듈 export 추가\n6. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- 기존 dummyEvents, dummyUsers 재사용\n- 타입 안전성 보장 (admin 타입 import 사용)\n- 실제 데이터처럼 보이도록 랜덤 값 적용\n- JSDoc 주석 완비",
+      "completedAt": "2025-10-14T08:37:12.001Z"
+    },
+    {
+      "id": "53bdf718-2d18-4c68-bff8-aeaba5b14430",
+      "name": "관리자 로그인 페이지 구현",
+      "description": "관리자 로그인 페이지를 React Hook Form + Zod 스키마로 구현합니다. Phase 2이므로 실제 인증은 하지 않고, 폼 제출 시 /admin/dashboard로 이동하는 더미 로그인을 구현합니다.",
+      "notes": "AdminSidebar는 app/admin/layout.tsx에 포함되어 있으므로, 로그인 페이지에서는 제외하기 위해 별도 레이아웃을 고려하거나 layout.tsx를 수정해야 할 수 있습니다. 또는 로그인 페이지를 /admin/login이 아닌 /auth/admin-login으로 이동하는 것도 고려할 수 있습니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:38:13.525Z",
+      "relatedFiles": [
+        {
+          "path": "app/admin/login/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "로그인 페이지 구현"
+        },
+        {
+          "path": "components/ui/form.tsx",
+          "type": "DEPENDENCY",
+          "description": "React Hook Form 컴포넌트"
+        },
+        {
+          "path": "components/ui/input.tsx",
+          "type": "DEPENDENCY",
+          "description": "Input 컴포넌트"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "Button 컴포넌트"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "Card 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. app/admin/login/page.tsx를 Client Component로 수정:\\n   'use client' 추가\\n\\n2. Zod 스키마 정의:\\n   const loginSchema = z.object({\\n     email: z.string().email('올바른 이메일을 입력하세요'),\\n     password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다'),\\n   });\\n\\n3. React Hook Form 설정:\\n   const form = useForm<LoginFormData>({\\n     resolver: zodResolver(loginSchema),\\n     defaultValues: { email: '', password: '' },\\n   });\\n\\n4. 폼 제출 핸들러:\\n   const onSubmit = (data: LoginFormData) => {\\n     console.log('Admin login:', data);\\n     router.push('/admin/dashboard');\\n   };\\n\\n5. UI 구현:\\n   - 중앙 정렬 레이아웃 (flex items-center justify-center min-h-screen)\\n   - Card 컴포넌트로 로그인 폼 감싸기\\n   - Form, FormField 컴포넌트 사용\\n   - Input (email, password)\\n   - Button (제출)\\n   - 다크 모드 bg-gray-50 dark:bg-gray-900",
+      "verificationCriteria": "1. 로그인 페이지가 중앙 정렬로 렌더링됨\\n2. 이메일 유효성 검사 동작 (잘못된 이메일 입력 시 에러 메시지)\\n3. 비밀번호 최소 6자 검사 동작\\n4. 폼 제출 시 /admin/dashboard로 이동\\n5. 다크 모드에서 정상 표시\\n6. npm run check-all 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 3 완료: 관리자 로그인 페이지 구현 완료\n\n**완료 항목:**\n1. ✅ Client Component로 구현 ('use client' 추가)\n2. ✅ Zod 스키마 정의:\n   - 이메일 유효성 검사\n   - 비밀번호 최소 6자 검증\n3. ✅ React Hook Form 설정 및 zodResolver 적용\n4. ✅ 폼 제출 시 /admin/dashboard로 이동하는 더미 로그인 구현\n5. ✅ UI 구현:\n   - 중앙 정렬 레이아웃 (flex items-center justify-center)\n   - Card 컴포넌트로 로그인 폼 감싸기\n   - Form, FormField 컴포넌트 사용\n   - Input (email, password)\n   - 다크 모드 지원 (bg-gray-50 dark:bg-gray-900)\n6. ✅ login/layout.tsx 추가로 AdminSidebar 제외\n7. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- JSDoc 주석 완비\n- 에러 메시지 한국어 처리\n- Phase 2 안내 메시지 포함\n- 접근성 고려 (FormLabel, placeholder)",
+      "completedAt": "2025-10-14T08:38:13.522Z"
+    },
+    {
+      "id": "0b5c0039-04a3-4baf-a992-397800357761",
+      "name": "관리자 대시보드 페이지 구현",
+      "description": "관리자 대시보드 메인 페이지를 구현합니다. 4개 KPI 카드, 최근 이벤트 목록, 최근 가입 사용자를 표시합니다. StatCard 컴포넌트를 생성하여 KPI 카드에 재사용합니다.",
+      "notes": "EventCard의 compact variant를 재사용하므로 의존성에 이전 작업이 필요합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        },
+        {
+          "taskId": "b9f45d07-f5e9-4200-b77a-af9ff9d65080"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:39:16.841Z",
+      "relatedFiles": [
+        {
+          "path": "components/admin/stat-card.tsx",
+          "type": "CREATE",
+          "description": "KPI 카드 컴포넌트"
+        },
+        {
+          "path": "app/admin/dashboard/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "대시보드 페이지 구현",
+          "lineStart": 1,
+          "lineEnd": 10
+        },
+        {
+          "path": "lib/data/admin.ts",
+          "type": "DEPENDENCY",
+          "description": "더미 데이터"
+        },
+        {
+          "path": "components/events/event-card.tsx",
+          "type": "DEPENDENCY",
+          "description": "EventCard compact variant 재사용"
+        }
+      ],
+      "implementationGuide": "1. components/admin/stat-card.tsx 컴포넌트 생성:\\n   interface StatCardProps {\\n     title: string;\\n     value: number;\\n     icon: LucideIcon;\\n     change?: number;\\n   }\\n   - Card 컴포넌트 사용\\n   - 아이콘 + 제목 (CardHeader)\\n   - 값 + 증감률 (CardContent)\\n   - 증감률이 양수면 녹색, 음수면 빨간색\\n\\n2. app/admin/dashboard/page.tsx 수정 (Server Component 유지):\\n   - lib/data/admin에서 dashboardMetrics import\\n   - 4개 KPI 카드: Grid 레이아웃 (grid-cols-1 md:grid-cols-2 lg:grid-cols-4)\\n     - 총 이벤트 (Calendar 아이콘)\\n     - 총 사용자 (Users 아이콘)\\n     - 진행 중 이벤트 (Activity 아이콘)\\n     - 이번 달 신규 (TrendingUp 아이콘)\\n\\n3. 최근 이벤트 섹션:\\n   - lib/data에서 dummyEvents import, 최신 3개만 slice\\n   - EventCard compact variant 재사용\\n   - \"모두 보기\" 버튼 → /admin/events\\n\\n4. 최근 가입 사용자 섹션:\\n   - lib/data에서 dummyUsers import, 최신 3명만 slice\\n   - Avatar + 이름 + 이메일 표시\\n   - Card 컴포넌트로 감싸기",
+      "verificationCriteria": "1. 대시보드가 렌더링되고 4개 KPI 카드가 Grid 레이아웃으로 표시됨\\n2. 각 KPI 카드에 아이콘, 값, 증감률이 표시됨\\n3. 최근 이벤트 3개가 EventCard compact variant로 표시됨\\n4. 최근 가입 사용자 3명이 Avatar와 함께 표시됨\\n5. 다크 모드에서 정상 표시\\n6. npm run check-all 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 4 완료: 관리자 대시보드 페이지 구현 완료\n\n**완료 항목:**\n1. ✅ StatCard 컴포넌트 생성 (components/admin/stat-card.tsx):\n   - 아이콘, 제목, 값, 증감률 표시\n   - 증감률 양수/음수에 따른 색상 변경\n   - 단위 표시 기능 추가\n2. ✅ 대시보드 페이지 구현 (Server Component 유지):\n   - 4개 KPI 카드 Grid 레이아웃 (총 이벤트, 총 사용자, 진행중, 이번달 신규)\n   - Lucide 아이콘 사용 (Calendar, Users, Activity, TrendingUp)\n3. ✅ 최근 이벤트 섹션:\n   - 최신 3개 이벤트 표시\n   - EventCard compact variant 재사용\n   - \"모두 보기\" 버튼 → /admin/events\n4. ✅ 최근 가입 사용자 섹션:\n   - 최신 3명 표시\n   - Avatar + 이름 + 이메일\n   - \"모두 보기\" 버튼 → /admin/users\n5. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- 반응형 레이아웃 (grid-cols-1 md:grid-cols-2 lg:grid-cols-4)\n- 다크 모드 지원\n- JSDoc 주석 완비\n- 데이터 정렬 (최신순)",
+      "completedAt": "2025-10-14T08:39:16.839Z"
+    },
+    {
+      "id": "0424aae7-676a-4004-88cf-38d4e09bfa0c",
+      "name": "이벤트 관리 테이블 페이지 구현",
+      "description": "이벤트 관리 페이지를 구현합니다. 검색, 상태 필터, 테이블 표시, 삭제 기능을 포함합니다. Client Component로 구현하여 클라이언트 사이드 필터링을 지원합니다.",
+      "notes": "참여자 수는 현재 더미 데이터에 없으므로 0명으로 표시하거나, getEventTableRows()에서 participant_count를 추가할 수 있습니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        },
+        {
+          "taskId": "b9f45d07-f5e9-4200-b77a-af9ff9d65080"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:40:19.593Z",
+      "relatedFiles": [
+        {
+          "path": "app/admin/events/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "이벤트 관리 페이지 구현"
+        },
+        {
+          "path": "components/ui/table.tsx",
+          "type": "DEPENDENCY",
+          "description": "Table 컴포넌트"
+        },
+        {
+          "path": "components/ui/input.tsx",
+          "type": "DEPENDENCY",
+          "description": "검색 Input"
+        },
+        {
+          "path": "components/ui/select.tsx",
+          "type": "DEPENDENCY",
+          "description": "상태 필터 Select"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "상태 Badge"
+        },
+        {
+          "path": "lib/data/admin.ts",
+          "type": "DEPENDENCY",
+          "description": "getEventTableRows 함수"
+        },
+        {
+          "path": "lib/utils/format.ts",
+          "type": "DEPENDENCY",
+          "description": "formatDateShort 함수"
+        }
+      ],
+      "implementationGuide": "1. app/admin/events/page.tsx를 Client Component로 수정:\\n   'use client' 추가\\n\\n2. 상태 관리 (useState):\\n   - searchQuery: string\\n   - statusFilter: 'all' | 'upcoming' | 'ongoing' | 'ended'\\n   - events: Event[] (초기값 dummyEvents)\\n\\n3. 필터링 로직 (useMemo):\\n   const filteredEvents = useMemo(() => {\\n     return events\\n       .filter(e => e.title.includes(searchQuery) || e.invite_code.includes(searchQuery))\\n       .filter(e => statusFilter === 'all' || e.status === statusFilter);\\n   }, [events, searchQuery, statusFilter]);\\n\\n4. UI 구현:\\n   - 상단 툴바: Input (검색) + Select (상태 필터)\\n   - Table 컴포넌트:\\n     - 컬럼: 제목, 초대 코드, 날짜 (formatDateShort), 상태 (Badge), 참여자 수, 액션\\n     - 각 행에 삭제 버튼 (Trash2 아이콘)\\n   - 삭제 핸들러: confirm 다이얼로그 → setEvents로 상태에서 제거\\n\\n5. Badge 상태 매핑:\\n   - upcoming → Badge variant=\\\"default\\\"\\n   - ongoing → Badge variant=\\\"secondary\\\"\\n   - ended → Badge variant=\\\"outline\\\"",
+      "verificationCriteria": "1. 이벤트 관리 페이지가 렌더링되고 테이블에 이벤트 목록이 표시됨\\n2. 검색창에 제목 또는 초대 코드 입력 시 즉시 필터링됨\\n3. 상태 필터 변경 시 즉시 필터링됨\\n4. 각 이벤트의 상태가 올바른 색상의 Badge로 표시됨\\n5. 삭제 버튼 클릭 시 confirm 후 테이블에서 제거됨\\n6. 다크 모드에서 정상 표시\\n7. npm run check-all 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 5 완료: 이벤트 관리 테이블 페이지 구현 완료\n\n**완료 항목:**\n1. ✅ Client Component로 구현 ('use client' 추가)\n2. ✅ 상태 관리:\n   - events, searchQuery, statusFilter useState 구현\n3. ✅ 필터링 로직:\n   - useMemo로 최적화된 필터링\n   - 제목/초대코드 검색\n   - 상태별 필터 (all/upcoming/ongoing/ended)\n4. ✅ UI 구현:\n   - 검색 Input (Search 아이콘)\n   - 상태 Select 필터\n   - Table 컴포넌트 (7개 컬럼)\n   - Badge로 상태 표시 (variant별 색상)\n   - 삭제 버튼 (Trash2 아이콘, destructive 색상)\n5. ✅ 삭제 기능:\n   - confirm 다이얼로그\n   - setEvents로 상태 업데이트\n6. ✅ getEventTableRows() 사용 (호스트명, 참여자수 포함)\n7. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- 반응형 레이아웃 (flex-col md:flex-row)\n- 다크 모드 지원\n- 검색 결과 카운트 표시\n- 빈 결과 처리\n- JSDoc 주석 완비",
+      "completedAt": "2025-10-14T08:40:19.591Z"
+    },
+    {
+      "id": "a2c77799-92cf-45ac-a1d0-6091e025d94d",
+      "name": "사용자 관리 테이블 페이지 구현",
+      "description": "사용자 관리 페이지를 구현합니다. 검색, 권한 필터, 테이블 표시, 권한 변경 UI를 포함합니다. 이벤트 관리 페이지와 유사한 패턴을 사용합니다.",
+      "notes": "이벤트 관리 페이지와 매우 유사한 구조이므로 패턴을 복제하여 빠르게 구현할 수 있습니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        },
+        {
+          "taskId": "b9f45d07-f5e9-4200-b77a-af9ff9d65080"
+        },
+        {
+          "taskId": "0424aae7-676a-4004-88cf-38d4e09bfa0c"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:41:23.481Z",
+      "relatedFiles": [
+        {
+          "path": "app/admin/users/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "사용자 관리 페이지 구현"
+        },
+        {
+          "path": "components/ui/table.tsx",
+          "type": "DEPENDENCY",
+          "description": "Table 컴포넌트"
+        },
+        {
+          "path": "components/ui/avatar.tsx",
+          "type": "DEPENDENCY",
+          "description": "Avatar 컴포넌트"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "권한 Badge"
+        },
+        {
+          "path": "components/ui/dropdown-menu.tsx",
+          "type": "DEPENDENCY",
+          "description": "권한 변경 드롭다운"
+        },
+        {
+          "path": "lib/data/admin.ts",
+          "type": "DEPENDENCY",
+          "description": "getUserTableRows 함수"
+        },
+        {
+          "path": "lib/utils/format.ts",
+          "type": "DEPENDENCY",
+          "description": "formatDateShort, getInitials 함수"
+        },
+        {
+          "path": "app/admin/events/page.tsx",
+          "type": "REFERENCE",
+          "description": "참조할 패턴"
+        }
+      ],
+      "implementationGuide": "1. app/admin/users/page.tsx를 Client Component로 수정:\\n   'use client' 추가\\n\\n2. 상태 관리 (useState):\\n   - searchQuery: string\\n   - roleFilter: 'all' | 'user' | 'admin'\\n   - users: UserTableRow[] (초기값 getUserTableRows())\\n\\n3. 필터링 로직 (useMemo):\\n   const filteredUsers = useMemo(() => {\\n     return users\\n       .filter(u => u.name.includes(searchQuery) || u.email.includes(searchQuery))\\n       .filter(u => roleFilter === 'all' || u.role === roleFilter);\\n   }, [users, searchQuery, roleFilter]);\\n\\n4. UI 구현:\\n   - 상단 툴바: Input (검색) + Select (권한 필터)\\n   - Table 컴포넌트:\\n     - 컬럼: Avatar, 이름, 이메일, 권한 (Badge), 가입일, 생성 이벤트 수, 참여 이벤트 수, 액션\\n     - 권한 Badge: user → default, admin → destructive\\n   - 액션: 권한 변경 드롭다운 (더미 - setState로 role만 변경)\\n\\n5. 권한 변경 핸들러:\\n   const handleRoleChange = (userId: string, newRole: 'user' | 'admin') => {\\n     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));\\n   };",
+      "verificationCriteria": "1. 사용자 관리 페이지가 렌더링되고 테이블에 사용자 목록이 표시됨\\n2. 검색창에 이름 또는 이메일 입력 시 즉시 필터링됨\\n3. 권한 필터 변경 시 즉시 필터링됨\\n4. 각 사용자의 Avatar와 권한 Badge가 표시됨\\n5. 권한 변경 드롭다운 클릭 시 role이 변경됨\\n6. 생성/참여 이벤트 수가 올바르게 표시됨\\n7. 다크 모드에서 정상 표시\\n8. npm run check-all 통과",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 6 완료: 사용자 관리 테이블 페이지 구현 완료\n\n**완료 항목:**\n1. ✅ Client Component로 구현 ('use client' 추가)\n2. ✅ 상태 관리:\n   - users, searchQuery, roleFilter useState 구현\n3. ✅ 필터링 로직:\n   - useMemo로 최적화된 필터링\n   - 이름/이메일 검색\n   - 권한별 필터 (all/user/admin)\n4. ✅ UI 구현:\n   - 검색 Input (Search 아이콘)\n   - 권한 Select 필터\n   - Table 컴포넌트 (7개 컬럼)\n   - Avatar + 이름 표시\n   - Badge로 권한 표시 (user: default, admin: destructive)\n   - 생성/참여 이벤트 수 표시\n5. ✅ 권한 변경 기능:\n   - DropdownMenu로 UI 구현\n   - 사용자/관리자로 변경 옵션\n   - handleRoleChange로 상태 업데이트\n6. ✅ getUserTableRows() 사용\n7. ✅ TypeScript 타입 체크 통과\n\n**구현 품질:**\n- 반응형 레이아웃\n- 다크 모드 지원\n- 검색 결과 카운트 표시\n- 빈 결과 처리\n- JSDoc 주석 완비",
+      "completedAt": "2025-10-14T08:41:23.478Z"
+    },
+    {
+      "id": "23903d08-b965-4ff6-a43f-9b326c6a40c8",
+      "name": "통계 분석 페이지 및 Recharts 차트 구현",
+      "description": "통계 분석 페이지를 구현하고, Recharts를 사용한 4개의 차트 컴포넌트를 생성합니다. 이벤트 생성 추이, 이벤트 상태 분포, 사용자 가입 추이, 인기 이벤트 TOP 5를 시각화합니다.",
+      "notes": "차트 컴포넌트를 별도 파일로 분리하면 코드 스플리팅과 재사용성이 향상됩니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "519d19e2-3dd7-4112-ba6a-db4096c7ba58"
+        },
+        {
+          "taskId": "b9f45d07-f5e9-4200-b77a-af9ff9d65080"
+        }
+      ],
+      "createdAt": "2025-10-14T08:23:59.088Z",
+      "updatedAt": "2025-10-14T08:44:09.144Z",
+      "relatedFiles": [
+        {
+          "path": "components/admin/charts/event-trend-chart.tsx",
+          "type": "CREATE",
+          "description": "이벤트 생성 추이 차트"
+        },
+        {
+          "path": "components/admin/charts/event-status-chart.tsx",
+          "type": "CREATE",
+          "description": "이벤트 상태 분포 차트"
+        },
+        {
+          "path": "components/admin/charts/user-trend-chart.tsx",
+          "type": "CREATE",
+          "description": "사용자 가입 추이 차트"
+        },
+        {
+          "path": "components/admin/charts/top-events-chart.tsx",
+          "type": "CREATE",
+          "description": "인기 이벤트 TOP 5 차트"
+        },
+        {
+          "path": "app/admin/stats/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "통계 분석 페이지 구현"
+        },
+        {
+          "path": "lib/data/admin.ts",
+          "type": "DEPENDENCY",
+          "description": "차트 데이터"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "차트를 감싸는 Card"
+        }
+      ],
+      "implementationGuide": "1. 차트 컴포넌트 생성 (components/admin/charts/):\\n\\n   a. event-trend-chart.tsx (LineChart):\\n      - Props: data (ChartDataPoint[])\\n      - ResponsiveContainer height={300}\\n      - XAxis dataKey=\\\"date\\\"\\n      - YAxis\\n      - Line stroke=\\\"hsl(var(--primary))\\\"\\n\\n   b. event-status-chart.tsx (PieChart):\\n      - Props: data ({ name, value }[])\\n      - PieChart + Pie dataKey=\\\"value\\\"\\n      - Cell로 색상 매핑\\n\\n   c. user-trend-chart.tsx (AreaChart):\\n      - Props: data (ChartDataPoint[])\\n      - AreaChart + Area fill=\\\"hsl(var(--primary))\\\"\\n\\n   d. top-events-chart.tsx (BarChart):\\n      - Props: data ({ name, participants }[])\\n      - BarChart + Bar dataKey=\\\"participants\\\"\\n\\n2. app/admin/stats/page.tsx 구현 (Server Component):\\n   - lib/data/admin에서 차트 데이터 import\\n   - Grid 레이아웃 (grid-cols-1 md:grid-cols-2 gap-6)\\n   - 각 차트를 Card로 감싸서 배치\\n   - CardHeader에 차트 제목\\n\\n3. 다크 모드 대응:\\n   - Recharts 색상을 Tailwind CSS 변수 사용 (hsl(var(--primary)))\\n   - CartesianGrid stroke를 다크 모드에서 적절한 색상으로",
+      "verificationCriteria": "1. 통계 분석 페이지가 렌더링되고 4개의 차트가 Grid 레이아웃으로 표시됨\\n2. LineChart (이벤트 추이)가 30일치 데이터로 정상 렌더링됨\\n3. PieChart (상태 분포)가 3개 상태로 정상 렌더링됨\\n4. AreaChart (사용자 추이)가 30일치 데이터로 정상 렌더링됨\\n5. BarChart (TOP 5)가 5개 이벤트로 정상 렌더링됨\\n6. 다크 모드에서 차트가 가독성 있게 표시됨\\n7. 반응형 레이아웃 (1024px 이상)\\n8. npm run check-all 통과\\n9. npm run build 성공",
+      "analysisResult": "Task 006: 관리자 데스크톱 페이지 UI 완성\n\n## 전체 목표\nGather 애플리케이션의 관리자 페이지 UI를 더미 데이터로 완성합니다. Phase 2 단계로 데이터베이스 연동 없이 전체 UI를 먼저 완성하여 요구사항을 확정합니다.\n\n## 기술 스택\n- Next.js 15 App Router\n- TypeScript\n- Tailwind CSS\n- shadcn/ui (new-york 스타일)\n- Recharts (신규 설치)\n- React Hook Form + Zod\n\n## 아키텍처 원칙\n- @/* 경로 별칭 사용 필수\n- Server Components 우선, 인터렉션 필요 시 Client Components\n- 파일명 kebab-case, 컴포넌트명 PascalCase\n- 주석 한국어, 변수명 영어\n- cn() 유틸리티로 Tailwind 클래스 관리\n- 다크 모드 지원 (dark: 접두사)\n\n## 기존 컴포넌트 재사용\n- EventCard (components/events/event-card.tsx): compact variant 재사용\n- Badge (components/ui/badge.tsx): 상태 및 권한 표시\n- lib/types/admin.ts: 관리자 타입 이미 정의됨\n\n## 검증 기준\n- TypeScript 타입 오류 없음\n- ESLint, Prettier 통과 (npm run check-all)\n- 빌드 성공 (npm run build)\n- 다크 모드 정상 작동\n- 1024px 이상 반응형 지원",
+      "summary": "✅ Task 7 완료: 통계 분석 페이지 및 Recharts 차트 구현 완료\n\n**완료 항목:**\n1. ✅ 4개 차트 컴포넌트 생성 (components/admin/charts/):\n   - EventTrendChart: LineChart로 이벤트 생성 추이 (30일)\n   - EventStatusChart: PieChart로 상태별 분포\n   - UserTrendChart: AreaChart로 사용자 가입 추이 (30일)\n   - TopEventsChart: BarChart로 인기 이벤트 TOP 5\n2. ✅ 통계 분석 페이지 구현 (Server Component):\n   - Grid 레이아웃 (grid-cols-1 md:grid-cols-2)\n   - 각 차트를 Card로 감싸기\n   - 차트 데이터 import 및 props 전달\n3. ✅ Recharts 설정:\n   - ResponsiveContainer로 반응형 지원\n   - Tailwind CSS 변수 사용 (hsl(var(--primary)))\n   - Tooltip 스타일 다크모드 대응\n   - CartesianGrid, XAxis, YAxis, Legend 구현\n4. ✅ TypeScript 타입 체크 통과\n5. ✅ 프로덕션 빌드 성공\n\n**구현 품질:**\n- Client Component로 차트 구현 ('use client')\n- JSDoc 주석 완비\n- 다크 모드 지원\n- 반응형 레이아웃\n- 코드 스플리팅 (별도 컴포넌트 파일)",
+      "completedAt": "2025-10-14T08:44:09.141Z"
+    }
+  ]
+}

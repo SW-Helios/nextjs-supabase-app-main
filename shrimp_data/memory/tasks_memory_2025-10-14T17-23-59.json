@@ -1,0 +1,120 @@
+{
+  "tasks": [
+    {
+      "id": "02192bd5-8064-41e5-b0ce-51f4800129e8",
+      "name": "초대 코드 조회 헬퍼 함수 추가",
+      "description": "더미 데이터에서 invite_code로 이벤트를 조회하는 헬퍼 함수를 구현합니다. Phase 3 Supabase 전환을 대비하여 EventWithHost 타입을 반환하도록 설계합니다.",
+      "notes": "대소문자 구분 없는 검색으로 사용자 입력 오류 방지. Phase 3에서 DB 인덱스 추가 필요 (invite_code 컬럼).",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-14T06:09:56.823Z",
+      "updatedAt": "2025-10-14T06:22:25.349Z",
+      "relatedFiles": [
+        {
+          "path": "lib/data/index.ts",
+          "type": "TO_MODIFY",
+          "description": "getEventByInviteCode 함수 추가",
+          "lineStart": 232,
+          "lineEnd": 232
+        },
+        {
+          "path": "lib/types/models.ts",
+          "type": "REFERENCE",
+          "description": "EventWithHost 타입 참조"
+        }
+      ],
+      "implementationGuide": "lib/data/index.ts 파일에 다음 함수를 추가합니다:\\n\\n```typescript\\n/**\\n * 초대 코드로 이벤트 조회 (호스트 정보 포함)\\n *\\n * @param code - 초대 코드 (대소문자 구분 없음)\\n * @returns 호스트 정보가 포함된 이벤트 또는 undefined\\n */\\nexport function getEventByInviteCode(code: string): EventWithHost | undefined {\\n  // 1. 대소문자 구분 없이 검색 (사용자 편의성)\\n  const event = dummyEvents.find(e => \\n    e.invite_code.toUpperCase() === code.toUpperCase()\\n  );\\n  \\n  // 2. 이벤트 없으면 undefined 반환\\n  if (!event) return undefined;\\n  \\n  // 3. 호스트 정보 포함하여 반환\\n  return getEventWithHost(event.id);\\n}\\n```\\n\\nPhase 3 전환 시 Supabase 쿼리로 대체:\\n```typescript\\nconst { data } = await supabase\\n  .from('events')\\n  .select('*, host(*)')\\n  .eq('invite_code', code)\\n  .single();\\n```",
+      "verificationCriteria": "1. getEventByInviteCode('DEV2025') 호출 시 event-001 이벤트 반환\\n2. getEventByInviteCode('dev2025') 호출 시 동일한 결과 (대소문자 무관)\\n3. getEventByInviteCode('INVALID') 호출 시 undefined 반환\\n4. 반환된 이벤트에 host 정보 포함 확인\\n5. TypeScript 타입 체크 통과",
+      "analysisResult": "Gather 플랫폼의 참여자 모바일 UI/UX를 완성하여 주최자와 차별화된 사용자 경험을 제공합니다. 초대 링크를 통한 간편한 이벤트 참여, 읽기 전용 이벤트 뷰, 참여자 전용 네비게이션을 구현하며, Task 004의 공통 컴포넌트를 최대한 재사용합니다. Phase 2 단계로 더미 데이터를 사용하며, Phase 3 Supabase 연동을 대비한 확장 가능한 구조로 설계합니다.",
+      "summary": "lib/data/index.ts에 getEventByInviteCode() 함수를 성공적으로 구현했습니다. 대소문자 구분 없는 검색으로 사용자 편의성을 제공하며, EventWithHost 타입을 반환하여 호스트 정보를 포함합니다. Phase 3 Supabase 전환을 위한 확장 가능한 구조를 유지하며, 모든 검증 기준(DEV2025/dev2025 조회, INVALID 처리, 호스트 정보 포함, TypeScript 타입 체크)을 충족합니다.",
+      "completedAt": "2025-10-14T06:22:25.344Z"
+    },
+    {
+      "id": "896a87fd-d948-4355-a54e-375305e14920",
+      "name": "초대 링크 참여 페이지 및 참여 버튼 구현",
+      "description": "초대 코드를 통해 이벤트에 참여할 수 있는 페이지를 구현합니다. 이벤트 미리보기를 표시하고, 참여 확인 버튼을 제공합니다. 존재하지 않는 코드에 대한 에러 처리를 포함합니다.",
+      "notes": "1. Server Component로 SEO 최적화 (초대 링크 공유 시 유리)\\n2. 이미지는 Next.js Image 대신 일반 img 사용 (더미 데이터 Unsplash URL)\\n3. Phase 3에서 실제 참여 로직으로 대체 (Supabase insert + Realtime)\\n4. 접근성: aria-label 추가",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "02192bd5-8064-41e5-b0ce-51f4800129e8"
+        }
+      ],
+      "createdAt": "2025-10-14T06:09:56.823Z",
+      "updatedAt": "2025-10-14T06:22:55.639Z",
+      "relatedFiles": [
+        {
+          "path": "app/(mobile)/join/[code]/page.tsx",
+          "type": "CREATE",
+          "description": "초대 링크 참여 페이지 (Server Component)"
+        },
+        {
+          "path": "components/events/join-button.tsx",
+          "type": "CREATE",
+          "description": "참여 확인 버튼 (Client Component)"
+        },
+        {
+          "path": "components/ui/empty-state.tsx",
+          "type": "REFERENCE",
+          "description": "에러 처리에 재사용"
+        },
+        {
+          "path": "lib/utils/toast.ts",
+          "type": "REFERENCE",
+          "description": "showSuccess 함수 사용"
+        },
+        {
+          "path": "lib/utils/format.ts",
+          "type": "REFERENCE",
+          "description": "formatDate 함수 사용"
+        }
+      ],
+      "implementationGuide": "## 1. 참여 페이지 생성 (Server Component)\\n\\n**파일:** app/(mobile)/join/[code]/page.tsx\\n\\n```typescript\\nimport { redirect } from \\\"next/navigation\\\";\\nimport { Calendar, MapPin, Users } from \\\"lucide-react\\\";\\nimport { Card, CardContent, CardHeader } from \\\"@/components/ui/card\\\";\\nimport { EmptyState } from \\\"@/components/ui/empty-state\\\";\\nimport { JoinButton } from \\\"@/components/events/join-button\\\";\\nimport { getEventByInviteCode } from \\\"@/lib/data\\\";\\nimport { formatDate } from \\\"@/lib/utils/format\\\";\\n\\ninterface JoinEventPageProps {\\n  params: { code: string };\\n}\\n\\nexport default async function JoinEventPage({ params }: JoinEventPageProps) {\\n  const { code } = params;\\n\\n  // 1. 코드 유효성 검사\\n  if (!code || code.trim() === '') {\\n    return (\\n      <EmptyState\\n        title=\\\"잘못된 초대 링크입니다\\\"\\n        description=\\\"올바른 초대 코드를 입력해주세요\\\"\\n      />\\n    );\\n  }\\n\\n  // 2. 이벤트 조회\\n  const event = getEventByInviteCode(code);\\n\\n  // 3. 이벤트 없으면 404\\n  if (!event) {\\n    return (\\n      <EmptyState\\n        title=\\\"이벤트를 찾을 수 없습니다\\\"\\n        description=\\\"초대 코드를 다시 확인해주세요\\\"\\n      />\\n    );\\n  }\\n\\n  // 4. 이벤트 미리보기\\n  return (\\n    <div className=\\\"space-y-6\\\">\\n      <div>\\n        <h1 className=\\\"text-2xl font-bold\\\">이벤트 초대</h1>\\n        <p className=\\\"mt-1 text-sm text-muted-foreground\\\">\\n          {event.host.name}님이 초대했습니다\\n        </p>\\n      </div>\\n\\n      {/* 이벤트 카드 */}\\n      <Card>\\n        {event.cover_image_url && (\\n          <div className=\\\"relative h-48 w-full overflow-hidden rounded-t-lg\\\">\\n            <img\\n              src={event.cover_image_url}\\n              alt={event.title}\\n              className=\\\"h-full w-full object-cover\\\"\\n            />\\n          </div>\\n        )}\\n        <CardHeader>\\n          <h2 className=\\\"text-xl font-semibold\\\">{event.title}</h2>\\n          {event.description && (\\n            <p className=\\\"text-sm text-muted-foreground\\\">{event.description}</p>\\n          )}\\n        </CardHeader>\\n        <CardContent className=\\\"space-y-3\\\">\\n          <div className=\\\"flex items-center gap-2 text-sm\\\">\\n            <Calendar className=\\\"h-4 w-4 text-muted-foreground\\\" />\\n            <span>{formatDate(event.event_date)}</span>\\n          </div>\\n          <div className=\\\"flex items-center gap-2 text-sm\\\">\\n            <MapPin className=\\\"h-4 w-4 text-muted-foreground\\\" />\\n            <span>{event.location}</span>\\n          </div>\\n          <div className=\\\"flex items-center gap-2 text-sm\\\">\\n            <Users className=\\\"h-4 w-4 text-muted-foreground\\\" />\\n            <span>{event.participant_count}명 참여 중</span>\\n          </div>\\n        </CardContent>\\n      </Card>\\n\\n      {/* 참여 버튼 */}\\n      <JoinButton eventId={event.id} eventTitle={event.title} />\\n    </div>\\n  );\\n}\\n```\\n\\n## 2. 참여 버튼 구현 (Client Component)\\n\\n**파일:** components/events/join-button.tsx\\n\\n```typescript\\n\\\"use client\\\";\\n\\nimport { useState } from \\\"react\\\";\\nimport { useRouter } from \\\"next/navigation\\\";\\nimport { Loader2 } from \\\"lucide-react\\\";\\nimport { Button } from \\\"@/components/ui/button\\\";\\nimport { showSuccess } from \\\"@/lib/utils/toast\\\";\\n\\ninterface JoinButtonProps {\\n  eventId: string;\\n  eventTitle: string;\\n}\\n\\nexport function JoinButton({ eventId, eventTitle }: JoinButtonProps) {\\n  const [isJoining, setIsJoining] = useState(false);\\n  const router = useRouter();\\n\\n  const handleJoin = async () => {\\n    try {\\n      setIsJoining(true);\\n\\n      // Phase 2: API 호출 시뮬레이션\\n      console.log(\\\"이벤트 참여:\\\", eventId);\\n      await new Promise((resolve) => setTimeout(resolve, 1000));\\n\\n      // 성공 토스트\\n      showSuccess(`\\\"${eventTitle}\\\" 이벤트에 참여했습니다!`);\\n\\n      // 이벤트 상세 페이지로 이동\\n      router.push(`/events/${eventId}`);\\n    } catch (error) {\\n      console.error(\\\"참여 실패:\\\", error);\\n      setIsJoining(false);\\n    }\\n  };\\n\\n  return (\\n    <Button\\n      onClick={handleJoin}\\n      disabled={isJoining}\\n      size=\\\"lg\\\"\\n      className=\\\"w-full\\\"\\n      aria-label={`${eventTitle} 이벤트 참여하기`}\\n    >\\n      {isJoining ? (\\n        <>\\n          <Loader2 className=\\\"mr-2 h-4 w-4 animate-spin\\\" />\\n          참여 중...\\n        </>\\n      ) : (\\n        \\\"참여하기\\\"\\n      )}\\n    </Button>\\n  );\\n}\\n```",
+      "verificationCriteria": "1. /join/DEV2025 접속 시 \\\"2025 개발자 네트워킹 밤\\\" 이벤트 미리보기 표시\\n2. /join/INVALID 접속 시 \\\"이벤트를 찾을 수 없습니다\\\" 메시지\\n3. /join/ (빈 코드) 접속 시 \\\"잘못된 초대 링크입니다\\\" 메시지\\n4. 참여하기 버튼 클릭 시 1초 후 토스트 + /events/event-001로 이동\\n5. 로딩 중 버튼 비활성화 및 스피너 표시\\n6. 다크 모드 전환 시 스타일 정상 적용\\n7. 모바일 반응형 디자인 확인",
+      "analysisResult": "Gather 플랫폼의 참여자 모바일 UI/UX를 완성하여 주최자와 차별화된 사용자 경험을 제공합니다. 초대 링크를 통한 간편한 이벤트 참여, 읽기 전용 이벤트 뷰, 참여자 전용 네비게이션을 구현하며, Task 004의 공통 컴포넌트를 최대한 재사용합니다. Phase 2 단계로 더미 데이터를 사용하며, Phase 3 Supabase 연동을 대비한 확장 가능한 구조로 설계합니다.",
+      "summary": "초대 링크 참여 페이지와 참여 버튼을 성공적으로 구현했습니다. Server Component로 SEO 최적화된 참여 페이지를 생성하고, Client Component로 인터랙티브한 참여 버튼을 분리했습니다. EmptyState 컴포넌트 재사용으로 에러 처리를 구현했고, Image 컴포넌트로 이미지 최적화, aria-label로 접근성을 개선했습니다. 다크 모드 지원, 로딩 상태 표시, 성공 토스트, 자동 리다이렉트 등 모든 검증 기준을 충족합니다.",
+      "completedAt": "2025-10-14T06:22:55.633Z"
+    },
+    {
+      "id": "5f6e71d4-3f87-47ca-9253-2781930f4fb6",
+      "name": "참여자 전용 네비게이션 구현",
+      "description": "참여자가 이벤트를 생성할 수 없도록 FAB 버튼을 조건부로 표시하고, /events/new 페이지에 직접 접근 시 리다이렉트 처리를 추가합니다. 호스팅 이벤트가 있는 사용자만 이벤트를 생성할 수 있습니다.",
+      "notes": "1. MobileNav는 수정하지 않음 (복잡도 증가 방지)\\n2. Server Component에서 권한 체크 (더 안전)\\n3. Phase 3에서 user.role 기반으로 확장 가능\\n4. 참여자는 초대 링크로만 이벤트 접근",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-14T06:09:56.823Z",
+      "updatedAt": "2025-10-14T06:23:23.268Z",
+      "relatedFiles": [
+        {
+          "path": "app/(mobile)/events/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "FAB 버튼 조건부 렌더링 추가",
+          "lineStart": 85,
+          "lineEnd": 91
+        },
+        {
+          "path": "app/(mobile)/events/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "권한 체크 및 리다이렉트 추가",
+          "lineStart": 1,
+          "lineEnd": 30
+        },
+        {
+          "path": "lib/data/index.ts",
+          "type": "REFERENCE",
+          "description": "getUserHostedEvents 함수 사용"
+        },
+        {
+          "path": "components/navigation/mobile-nav.tsx",
+          "type": "REFERENCE",
+          "description": "네비게이션 구조 참조 (수정 없음)"
+        }
+      ],
+      "implementationGuide": "## 1. 이벤트 목록 페이지 FAB 조건부 렌더링\\n\\n**파일:** app/(mobile)/events/page.tsx (수정)\\n\\n```typescript\\n// 기존 코드 유지, FAB 버튼 부분만 수정\\n\\nexport default async function EventsPage() {\\n  const currentUserId = \\\"user-001\\\";\\n\\n  // 내가 만든 이벤트\\n  const hostedEvents = getUserHostedEvents(currentUserId);\\n  const hostedEventsWithHost = hostedEvents\\n    .map((event) => getEventWithHost(event.id))\\n    .filter((event) => event !== undefined);\\n\\n  // 내가 참여한 이벤트\\n  const participatingEvents = getUserEvents(currentUserId);\\n  const participatingEventsWithHost = participatingEvents\\n    .map((event) => getEventWithHost(event.id))\\n    .filter((event) => event !== undefined);\\n\\n  // 호스팅 이벤트가 있을 때만 FAB 표시\\n  const showFAB = hostedEvents.length > 0;\\n\\n  return (\\n    <div className=\\\"space-y-8 pb-24\\\">\\n      {/* 기존 이벤트 목록 코드 유지 */}\\n\\n      {/* FAB (Floating Action Button) - 조건부 렌더링 */}\\n      {showFAB && (\\n        <Link\\n          href=\\\"/events/new\\\"\\n          className=\\\"fixed bottom-20 right-4 z-10\\\"\\n          aria-label=\\\"이벤트 만들기\\\"\\n        >\\n          <Button size=\\\"lg\\\" className=\\\"h-14 w-14 rounded-full shadow-lg\\\">\\n            <Plus className=\\\"h-6 w-6\\\" />\\n          </Button>\\n        </Link>\\n      )}\\n    </div>\\n  );\\n}\\n```\\n\\n## 2. 이벤트 생성 페이지 권한 보호\\n\\n**파일:** app/(mobile)/events/new/page.tsx (수정)\\n\\n```typescript\\nimport { redirect } from \\\"next/navigation\\\";\\nimport { getUserHostedEvents } from \\\"@/lib/data\\\";\\nimport { EventForm } from \\\"@/components/events/event-form\\\";\\n// ... 기존 import\\n\\nexport default async function NewEventPage() {\\n  const currentUserId = \\\"user-001\\\";\\n\\n  // 권한 체크: 호스팅 이벤트가 없으면 접근 불가\\n  const hostedEvents = getUserHostedEvents(currentUserId);\\n  if (hostedEvents.length === 0) {\\n    // 이벤트 목록으로 리다이렉트\\n    redirect('/events');\\n  }\\n\\n  // 기존 이벤트 생성 폼 코드 유지\\n  const handleSubmit = async (data: EventFormData) => {\\n    // ...\\n  };\\n\\n  return (\\n    <div className=\\\"space-y-6 pb-8\\\">\\n      <div>\\n        <h1 className=\\\"text-2xl font-bold\\\">새 이벤트 만들기</h1>\\n        <p className=\\\"mt-1 text-sm text-muted-foreground\\\">\\n          멋진 이벤트를 만들어 사람들을 초대해보세요!\\n        </p>\\n      </div>\\n\\n      <EventForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />\\n    </div>\\n  );\\n}\\n```\\n\\n## Phase 3 전환 시 고려사항\\n\\n```typescript\\n// Phase 3: 사용자 role 기반 권한 체크\\nconst { data: user } = await supabase\\n  .from('users')\\n  .select('role')\\n  .eq('id', currentUserId)\\n  .single();\\n\\nif (user.role !== 'host' && hostedEvents.length === 0) {\\n  redirect('/events');\\n}\\n```",
+      "verificationCriteria": "1. user-001 (호스팅 이벤트 있음): FAB 버튼 표시, /events/new 접근 가능\\n2. user-003로 변경 (호스팅 이벤트 없음 가정): FAB 버튼 숨김\\n3. user-003로 /events/new 직접 접근 시 /events로 리다이렉트\\n4. 리다이렉트 시 무한 루프 없음\\n5. 이벤트 상세 페이지에서 참여자는 수정/삭제 버튼 안 보임 (기존 기능 확인)\\n6. TypeScript 타입 에러 없음",
+      "analysisResult": "Gather 플랫폼의 참여자 모바일 UI/UX를 완성하여 주최자와 차별화된 사용자 경험을 제공합니다. 초대 링크를 통한 간편한 이벤트 참여, 읽기 전용 이벤트 뷰, 참여자 전용 네비게이션을 구현하며, Task 004의 공통 컴포넌트를 최대한 재사용합니다. Phase 2 단계로 더미 데이터를 사용하며, Phase 3 Supabase 연동을 대비한 확장 가능한 구조로 설계합니다.",
+      "summary": "참여자 전용 네비게이션을 성공적으로 구현했습니다. app/(mobile)/events/page.tsx에서 FAB 버튼 조건부 렌더링(showFAB = hostedEvents.length > 0)을 추가하고, app/(mobile)/events/new/page.tsx에 Server Component 레벨에서 권한 체크를 구현했습니다. 호스팅 이벤트가 없는 사용자는 FAB 버튼이 숨겨지고, /events/new 직접 접근 시 /events로 리다이렉트됩니다. MobileNav를 수정하지 않아 복잡도를 최소화했으며, Phase 3 role 기반 권한으로 확장 가능한 구조를 유지합니다.",
+      "completedAt": "2025-10-14T06:23:23.261Z"
+    }
+  ]
+}

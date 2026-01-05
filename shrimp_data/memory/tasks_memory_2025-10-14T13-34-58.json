@@ -1,0 +1,310 @@
+{
+  "tasks": [
+    {
+      "id": "9ad61419-4994-42db-b32d-68bfad93b996",
+      "name": "모바일 하단 네비게이션 바 컴포넌트 구현",
+      "description": "모바일 레이아웃을 위한 하단 고정 네비게이션 바 컴포넌트를 생성합니다. 4개 탭(홈, 이벤트, 새 이벤트, 프로필)을 포함하며, 현재 활성 탭을 하이라이트합니다.",
+      "notes": "Client Component 필수. 네비게이션 아이템은 배열로 관리하면 확장성 좋음. z-index 추가하여 다른 요소 위에 표시.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:34:24.722Z",
+      "relatedFiles": [
+        {
+          "path": "components/navigation/mobile-nav.tsx",
+          "type": "CREATE",
+          "description": "모바일 하단 네비게이션 바 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. components/navigation/mobile-nav.tsx 파일 생성\n2. 'use client' 지시어 추가 (usePathname 사용)\n3. Lucide React 아이콘 import (Home, Calendar, PlusCircle, User)\n4. usePathname 훅으로 현재 경로 파악\n5. Link 컴포넌트로 4개 탭 생성\n6. 활성 탭 조건부 스타일링 (text-primary, font-semibold)\n7. 고정 위치 스타일: fixed bottom-0 inset-x-0 h-16 border-t bg-background\n\n코드 구조:\n```typescript\n'use client';\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\nimport { Home, Calendar, PlusCircle, User } from 'lucide-react';\n\nexport function MobileNav() {\n  const pathname = usePathname();\n  const isActive = (path: string) => pathname === path;\n  \n  return (\n    <nav className=\"fixed bottom-0 inset-x-0 h-16 border-t bg-background\">\n      <div className=\"flex h-full items-center justify-around\">\n        {/* 4개 탭 구현 */}\n      </div>\n    </nav>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 생성 확인\n2. TypeScript 컴파일 에러 없음\n3. 4개 탭 모두 렌더링\n4. usePathname 훅 정상 동작\n5. 활성 탭 스타일 적용 확인\n6. npm run typecheck 통과",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "모바일 하단 네비게이션 바 컴포넌트 구현 완료. components/navigation/mobile-nav.tsx 파일 생성. Client Component로 usePathname 훅 사용하여 활성 탭 하이라이트 구현. 4개 탭(홈, 이벤트, 새 이벤트, 프로필) 포함. Lucide React 아이콘 사용. 고정 하단 위치(fixed bottom-0), z-index: 50 적용. 네비게이션 아이템 배열로 관리하여 확장성 확보.",
+      "completedAt": "2025-10-14T03:34:24.721Z"
+    },
+    {
+      "id": "0d8bfc4c-4d89-47e0-8a60-6a5867edd88d",
+      "name": "관리자 사이드바 컴포넌트 구현",
+      "description": "관리자 페이지를 위한 좌측 고정 사이드바 컴포넌트를 생성합니다. 로고, 메뉴 항목(대시보드, 이벤트 관리, 사용자 관리, 통계), 로그아웃 버튼을 포함합니다.",
+      "notes": "다크 모드 고려하여 bg-gray-900 사용. 활성 메뉴는 bg-gray-800 또는 border-l-4 border-primary로 표시.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:34:53.344Z",
+      "relatedFiles": [
+        {
+          "path": "components/navigation/admin-sidebar.tsx",
+          "type": "CREATE",
+          "description": "관리자 좌측 사이드바 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. components/navigation/admin-sidebar.tsx 파일 생성\n2. 'use client' 지시어 추가\n3. Lucide React 아이콘 import (LayoutDashboard, Calendar, Users, BarChart3, LogOut)\n4. usePathname 훅으로 활성 메뉴 판별\n5. 메뉴 아이템 배열 정의\n6. 로고 영역 (h-16)\n7. 메뉴 리스트 렌더링\n8. 하단 로그아웃 버튼\n9. 고정 너비: w-60 (240px), bg-gray-900 text-white\n\n코드 구조:\n```typescript\n'use client';\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\nimport { LayoutDashboard, Calendar, Users, BarChart3, LogOut } from 'lucide-react';\n\nconst menuItems = [\n  { label: '대시보드', href: '/admin/dashboard', icon: LayoutDashboard },\n  { label: '이벤트 관리', href: '/admin/events', icon: Calendar },\n  { label: '사용자 관리', href: '/admin/users', icon: Users },\n  { label: '통계 분석', href: '/admin/stats', icon: BarChart3 },\n];\n\nexport function AdminSidebar() {\n  const pathname = usePathname();\n  return (\n    <aside className=\"w-60 min-h-screen bg-gray-900 text-white flex flex-col\">\n      {/* 로고, 메뉴, 로그아웃 */}\n    </aside>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 생성 확인\n2. TypeScript 컴파일 에러 없음\n3. 메뉴 아이템 배열 렌더링\n4. 활성 메뉴 하이라이트\n5. 240px 고정 너비 확인\n6. npm run typecheck 통과",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "관리자 사이드바 컴포넌트 구현 완료. components/navigation/admin-sidebar.tsx 파일 생성. Client Component로 usePathname 훅 사용하여 활성 메뉴 하이라이트 구현. 4개 메뉴(대시보드, 이벤트 관리, 사용자 관리, 통계 분석) 포함. 로고 영역(h-16), 로그아웃 버튼 추가. 240px 고정 너비(w-60), bg-gray-900 다크 테마. 활성 메뉴는 border-l-4 border-primary로 표시.",
+      "completedAt": "2025-10-14T03:34:53.342Z"
+    },
+    {
+      "id": "12e7ae5b-169f-4b65-95e4-8dc0088048db",
+      "name": "모바일 레이아웃 구현",
+      "description": "모바일 라우트 그룹의 공통 레이아웃을 구현합니다. 하단 네비게이션 바를 포함하며, 메인 콘텐츠 영역에 하단 패딩을 추가합니다.",
+      "notes": "pb-16은 네비게이션 높이(h-16)와 일치. Server Component이므로 'use client' 불필요.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "9ad61419-4994-42db-b32d-68bfad93b996"
+        }
+      ],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:35:15.259Z",
+      "relatedFiles": [
+        {
+          "path": "app/(mobile)/layout.tsx",
+          "type": "CREATE",
+          "description": "모바일 라우트 그룹 공통 레이아웃"
+        },
+        {
+          "path": "components/navigation/mobile-nav.tsx",
+          "type": "DEPENDENCY",
+          "description": "import할 네비게이션 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. app/(mobile)/layout.tsx 파일 생성\n2. MobileNav 컴포넌트 import\n3. Server Component로 구현 (기본)\n4. children을 감싸는 구조\n5. 하단 64px 패딩 (pb-16) 추가하여 네비게이션 공간 확보\n6. min-h-screen으로 최소 높이 설정\n\n코드 구조:\n```typescript\nimport { MobileNav } from '@/components/navigation/mobile-nav';\n\nexport default function MobileLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <div className=\"min-h-screen pb-16\">\n      <main className=\"p-4\">{children}</main>\n      <MobileNav />\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 생성 확인\n2. MobileNav import 에러 없음\n3. 레이아웃이 children을 감쌈\n4. 하단 패딩 적용 확인\n5. TypeScript 타입 에러 없음",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "모바일 레이아웃 구현 완료. app/(mobile)/layout.tsx 파일 생성. Server Component로 구현. MobileNav 컴포넌트 import 및 하단 고정 배치. children을 main 태그로 감싸고 p-4 패딩 적용. 하단 네비게이션 공간 확보를 위해 pb-16 패딩 추가. min-h-screen으로 최소 화면 높이 설정.",
+      "completedAt": "2025-10-14T03:35:15.257Z"
+    },
+    {
+      "id": "b4634dab-a3b1-4111-a7f0-0ba3f78fc3ef",
+      "name": "모바일 페이지 파일 생성 (7개)",
+      "description": "모바일 라우트의 7개 페이지 파일을 생성합니다: 이벤트 목록, 이벤트 생성, 이벤트 상세, 이벤트 수정, 초대 링크, 프로필. 각 페이지는 기본 골격만 포함합니다.",
+      "notes": "각 페이지는 Server Component. 동적 라우트는 params 타입 명시 필수. 템플릿 복사 후 제목만 변경.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "12e7ae5b-169f-4b65-95e4-8dc0088048db"
+        }
+      ],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:35:45.586Z",
+      "relatedFiles": [
+        {
+          "path": "app/(mobile)/events/page.tsx",
+          "type": "CREATE",
+          "description": "내 이벤트 목록 페이지"
+        },
+        {
+          "path": "app/(mobile)/events/new/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 생성 페이지"
+        },
+        {
+          "path": "app/(mobile)/events/[id]/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 상세 페이지"
+        },
+        {
+          "path": "app/(mobile)/events/[id]/edit/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 수정 페이지"
+        },
+        {
+          "path": "app/(mobile)/invite/[code]/page.tsx",
+          "type": "CREATE",
+          "description": "초대 링크 참여 페이지"
+        },
+        {
+          "path": "app/(mobile)/profile/page.tsx",
+          "type": "CREATE",
+          "description": "프로필 페이지"
+        }
+      ],
+      "implementationGuide": "다음 7개 파일 생성:\n\n1. app/(mobile)/events/page.tsx\n```typescript\nexport default function EventsPage() {\n  return (\n    <div className=\"space-y-4\">\n      <h1 className=\"text-2xl font-bold\">내 이벤트 목록</h1>\n      <p className=\"text-gray-600\">Phase 2에서 이벤트 카드 리스트 구현 예정</p>\n    </div>\n  );\n}\n```\n\n2. app/(mobile)/events/new/page.tsx - \"새 이벤트 만들기\"\n3. app/(mobile)/events/[id]/page.tsx - \"이벤트 상세\" (동적 라우트)\n4. app/(mobile)/events/[id]/edit/page.tsx - \"이벤트 수정\" (동적 라우트)\n5. app/(mobile)/invite/[code]/page.tsx - \"초대 링크 참여\" (동적 라우트)\n6. app/(mobile)/profile/page.tsx - \"프로필\"\n\n동적 라우트 타입:\n```typescript\ntype PageProps = {\n  params: { id: string }; // 또는 { code: string }\n};\n\nexport default function PageName({ params }: PageProps) {\n  return (\n    <div className=\"space-y-4\">\n      <h1 className=\"text-2xl font-bold\">페이지 제목</h1>\n      <p className=\"text-gray-600\">ID: {params.id}</p>\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. 7개 파일 모두 생성 확인\n2. 각 페이지 렌더링 가능\n3. 동적 라우트 params 타입 정의\n4. TypeScript 컴파일 에러 없음\n5. 브라우저에서 각 경로 접근 확인 (/events, /events/new, /events/test-id, /profile 등)",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "모바일 페이지 7개 파일 생성 완료. 이벤트 목록, 이벤트 생성, 이벤트 상세, 이벤트 수정, 초대 링크, 프로필 페이지 구현. 동적 라우트([id], [code])는 params 타입 명시. 모든 페이지는 Server Component로 구현. 기본 골격 구조(제목 + 설명)만 포함하며 Phase 2에서 실제 UI 구현 예정.",
+      "completedAt": "2025-10-14T03:35:45.584Z"
+    },
+    {
+      "id": "dfb3252d-1eaa-465f-93bf-e9a0ca8376ac",
+      "name": "관리자 레이아웃 구현",
+      "description": "관리자 라우트의 공통 레이아웃을 구현합니다. 좌측 사이드바와 우측 메인 콘텐츠 영역으로 구성된 Flexbox 레이아웃입니다.",
+      "notes": "다크 모드 고려하여 dark:bg-gray-900 추가. Flexbox로 사이드바와 콘텐츠 수평 배치.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "0d8bfc4c-4d89-47e0-8a60-6a5867edd88d"
+        }
+      ],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:36:06.859Z",
+      "relatedFiles": [
+        {
+          "path": "app/admin/layout.tsx",
+          "type": "CREATE",
+          "description": "관리자 라우트 공통 레이아웃"
+        },
+        {
+          "path": "components/navigation/admin-sidebar.tsx",
+          "type": "DEPENDENCY",
+          "description": "import할 사이드바 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. app/admin/layout.tsx 파일 생성\n2. AdminSidebar 컴포넌트 import\n3. Server Component로 구현\n4. Flexbox 수평 레이아웃 (flex)\n5. 사이드바(고정 240px) + 메인(flex-1)\n6. 메인 콘텐츠 배경색: bg-gray-50\n7. 메인 콘텐츠 패딩: p-8\n\n코드 구조:\n```typescript\nimport { AdminSidebar } from '@/components/navigation/admin-sidebar';\n\nexport default function AdminLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <div className=\"flex min-h-screen\">\n      <AdminSidebar />\n      <main className=\"flex-1 p-8 bg-gray-50 dark:bg-gray-900\">\n        {children}\n      </main>\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 생성 확인\n2. AdminSidebar import 에러 없음\n3. Flexbox 레이아웃 동작\n4. 사이드바 고정, 콘텐츠 영역 확장\n5. TypeScript 타입 에러 없음",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "관리자 레이아웃 구현 완료. app/admin/layout.tsx 파일 생성. AdminSidebar 컴포넌트 import 및 좌측 고정 배치. Flexbox 수평 레이아웃으로 사이드바와 메인 콘텐츠 영역 구성. 메인 콘텐츠는 flex-1로 확장, p-8 패딩 적용. bg-gray-50 배경색 및 dark:bg-gray-900 다크 모드 지원.",
+      "completedAt": "2025-10-14T03:36:06.856Z"
+    },
+    {
+      "id": "b0ef3dae-220f-4be2-962f-d705236ee3c7",
+      "name": "관리자 페이지 파일 생성 (5개)",
+      "description": "관리자 라우트의 5개 페이지 파일을 생성합니다: 로그인, 대시보드, 이벤트 관리, 사용자 관리, 통계 분석. 각 페이지는 기본 골격만 포함합니다.",
+      "notes": "관리자 페이지는 모두 Server Component. 로그인 페이지는 레이아웃 제외 필요 시 별도 처리.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "dfb3252d-1eaa-465f-93bf-e9a0ca8376ac"
+        }
+      ],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:36:33.742Z",
+      "relatedFiles": [
+        {
+          "path": "app/admin/login/page.tsx",
+          "type": "CREATE",
+          "description": "관리자 로그인 페이지"
+        },
+        {
+          "path": "app/admin/dashboard/page.tsx",
+          "type": "CREATE",
+          "description": "관리자 대시보드 메인 페이지"
+        },
+        {
+          "path": "app/admin/events/page.tsx",
+          "type": "CREATE",
+          "description": "관리자 이벤트 관리 페이지"
+        },
+        {
+          "path": "app/admin/users/page.tsx",
+          "type": "CREATE",
+          "description": "관리자 사용자 관리 페이지"
+        },
+        {
+          "path": "app/admin/stats/page.tsx",
+          "type": "CREATE",
+          "description": "관리자 통계 분석 페이지"
+        }
+      ],
+      "implementationGuide": "다음 5개 파일 생성:\n\n1. app/admin/login/page.tsx\n```typescript\nexport default function AdminLoginPage() {\n  return (\n    <div className=\"space-y-4\">\n      <h1 className=\"text-2xl font-bold\">관리자 로그인</h1>\n      <p className=\"text-gray-600\">Phase 3에서 Google OAuth 및 role 체크 구현 예정</p>\n    </div>\n  );\n}\n```\n\n2. app/admin/dashboard/page.tsx - \"대시보드\"\n```typescript\nexport default function AdminDashboardPage() {\n  return (\n    <div className=\"space-y-6\">\n      <h1 className=\"text-3xl font-bold\">대시보드</h1>\n      <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\">\n        <p className=\"text-gray-600\">Phase 2에서 지표 카드 구현 예정</p>\n      </div>\n    </div>\n  );\n}\n```\n\n3. app/admin/events/page.tsx - \"이벤트 관리\"\n4. app/admin/users/page.tsx - \"사용자 관리\"\n5. app/admin/stats/page.tsx - \"통계 분석\"",
+      "verificationCriteria": "1. 5개 파일 모두 생성 확인\n2. 각 페이지 렌더링 가능\n3. TypeScript 컴파일 에러 없음\n4. 브라우저에서 각 경로 접근 확인 (/admin/login, /admin/dashboard, /admin/events 등)\n5. 사이드바와 함께 렌더링 확인",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "관리자 페이지 5개 파일 생성 완료. 로그인, 대시보드, 이벤트 관리, 사용자 관리, 통계 분석 페이지 구현. 모든 페이지는 Server Component로 구현. 기본 골격 구조(제목 + 설명)만 포함하며 Phase 2-3에서 실제 UI 및 기능 구현 예정. 관리자 레이아웃과 사이드바와 함께 렌더링됨.",
+      "completedAt": "2025-10-14T03:36:33.740Z"
+    },
+    {
+      "id": "b2a9790d-2635-4fd1-b718-a24d2865befa",
+      "name": "홈 페이지 랜딩 콘텐츠 교체",
+      "description": "기존 스타터 킷 튜토리얼 내용을 Gather 서비스 소개 랜딩 페이지로 교체합니다. 서비스 핵심 가치 제안과 Google 로그인 버튼을 포함합니다.",
+      "notes": "Button 컴포넌트는 shadcn/ui에서 import. 실제 Google OAuth는 /auth/login에서 처리.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:37:22.556Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지 - 스타터 킷 내용을 랜딩 페이지로 교체",
+          "lineStart": 1,
+          "lineEnd": 52
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "REFERENCE",
+          "description": "사용할 Button 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. app/page.tsx 파일 수정\n2. 기존 import 제거 (Hero, ConnectSupabaseSteps 등)\n3. 새로운 랜딩 페이지 구조 작성\n4. 서비스 소개 섹션 (제목, 설명, 주요 기능 3가지)\n5. Google 로그인 버튼 (Link to /auth/login)\n6. 간단한 footer\n\n코드 구조:\n```typescript\nimport Link from 'next/link';\nimport { Button } from '@/components/ui/button';\n\nexport default function Home() {\n  return (\n    <main className=\"flex min-h-screen flex-col items-center justify-center p-8\">\n      <div className=\"max-w-3xl text-center space-y-8\">\n        <h1 className=\"text-5xl font-bold\">Gather</h1>\n        <p className=\"text-xl text-gray-600\">\n          초대 링크 하나로 모든 것을 해결하는 일회성 이벤트 관리 플랫폼\n        </p>\n        <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4 mt-12\">\n          {/* 3가지 주요 기능 카드 */}\n        </div>\n        <Link href=\"/auth/login\">\n          <Button size=\"lg\" className=\"mt-8\">\n            Google로 시작하기\n          </Button>\n        </Link>\n      </div>\n    </main>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 수정 확인\n2. 기존 튜토리얼 내용 제거\n3. 새 랜딩 페이지 렌더링\n4. Google 로그인 버튼 표시\n5. /auth/login 링크 동작\n6. TypeScript 에러 없음",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "홈 페이지 랜딩 콘텐츠 교체 완료. app/page.tsx 파일 수정. 기존 스타터 킷 튜토리얼 내용 제거. Gather 서비스 소개 랜딩 페이지로 교체. 3가지 주요 기능 카드(간편한 이벤트 생성, 원클릭 초대, 실시간 참여자 관리) 추가. Google 로그인 버튼(/auth/login 링크) 포함. shadcn/ui Button 컴포넌트 및 Lucide React 아이콘 사용.",
+      "completedAt": "2025-10-14T03:37:22.529Z"
+    },
+    {
+      "id": "00b71e7e-a1ec-447f-86b6-bebf29fd82d0",
+      "name": "빈 상태 UI 컴포넌트 생성",
+      "description": "데이터가 없을 때 표시할 재사용 가능한 빈 상태 UI 컴포넌트를 생성합니다. 아이콘, 제목, 설명, 선택적 액션 버튼을 포함합니다.",
+      "notes": "Phase 2에서 이벤트 목록이 비었을 때 사용. 아이콘은 선택적으로 전달.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-13T10:30:14.788Z",
+      "updatedAt": "2025-10-14T03:37:49.466Z",
+      "relatedFiles": [
+        {
+          "path": "components/ui/empty-state.tsx",
+          "type": "CREATE",
+          "description": "재사용 가능한 빈 상태 UI 컴포넌트"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "REFERENCE",
+          "description": "사용할 Button 컴포넌트"
+        }
+      ],
+      "implementationGuide": "1. components/ui/empty-state.tsx 파일 생성\n2. Props 인터페이스 정의\n3. Server Component로 구현\n4. 중앙 정렬 레이아웃\n5. 아이콘, 제목, 설명 렌더링\n6. 선택적 액션 버튼\n\n코드 구조:\n```typescript\nimport { LucideIcon } from 'lucide-react';\nimport { Button } from '@/components/ui/button';\n\ninterface EmptyStateProps {\n  icon?: LucideIcon;\n  title: string;\n  description?: string;\n  action?: {\n    label: string;\n    onClick: () => void;\n  };\n}\n\nexport function EmptyState({\n  icon: Icon,\n  title,\n  description,\n  action,\n}: EmptyStateProps) {\n  return (\n    <div className=\"flex flex-col items-center justify-center p-8 text-center\">\n      {Icon && <Icon className=\"w-16 h-16 text-gray-400 mb-4\" />}\n      <h3 className=\"text-lg font-semibold mb-2\">{title}</h3>\n      {description && (\n        <p className=\"text-gray-600 mb-4\">{description}</p>\n      )}\n      {action && (\n        <Button onClick={action.onClick}>{action.label}</Button>\n      )}\n    </div>\n  );\n}\n```",
+      "verificationCriteria": "1. 파일 생성 확인\n2. Props 타입 정의 완료\n3. 조건부 렌더링 동작 확인\n4. TypeScript 컴파일 에러 없음\n5. 다른 컴포넌트에서 import 가능",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "빈 상태 UI 컴포넌트 생성 완료. components/ui/empty-state.tsx 파일 생성. EmptyStateProps 인터페이스 정의(icon, title, description, action). 중앙 정렬 레이아웃 구현. 선택적 아이콘, 제목, 설명, 액션 버튼 조건부 렌더링. text-muted-foreground로 일관된 스타일 적용. Phase 2에서 이벤트 목록 빈 상태 등에 재사용 가능.",
+      "completedAt": "2025-10-14T03:37:49.464Z"
+    },
+    {
+      "id": "c7b61bf1-4797-48f3-adf9-864894ece529",
+      "name": "빌드 검증 및 라우팅 테스트",
+      "description": "모든 파일 생성 후 프로젝트를 빌드하고, TypeScript 타입 체크를 실행하며, 모든 라우트에 접근하여 정상 동작을 확인합니다.",
+      "notes": "에러 발생 시 해당 파일로 돌아가 수정. 모든 경로가 404 없이 렌더링되어야 함.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "9ad61419-4994-42db-b32d-68bfad93b996"
+        },
+        {
+          "taskId": "0d8bfc4c-4d89-47e0-8a60-6a5867edd88d"
+        },
+        {
+          "taskId": "12e7ae5b-169f-4b65-95e4-8dc0088048db"
+        },
+        {
+          "taskId": "b4634dab-a3b1-4111-a7f0-0ba3f78fc3ef"
+        },
+        {
+          "taskId": "dfb3252d-1eaa-465f-93bf-e9a0ca8376ac"
+        },
+        {
+          "taskId": "b0ef3dae-220f-4be2-962f-d705236ee3c7"
+        },
+        {
+          "taskId": "b2a9790d-2635-4fd1-b718-a24d2865befa"
+        },
+        {
+          "taskId": "00b71e7e-a1ec-447f-86b6-bebf29fd82d0"
+        }
+      ],
+      "createdAt": "2025-10-13T10:30:14.789Z",
+      "updatedAt": "2025-10-14T03:39:07.042Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "REFERENCE",
+          "description": "빌드 스크립트 확인"
+        }
+      ],
+      "implementationGuide": "다음 명령어들을 순차적으로 실행:\n\n1. TypeScript 타입 체크\n```bash\nnpm run typecheck\n```\n\n2. 프로덕션 빌드\n```bash\nnpm run build\n```\n\n3. 개발 서버 실행 후 수동 테스트\n```bash\nnpm run dev\n```\n\n4. 브라우저에서 다음 경로들 접근:\n- / (홈)\n- /events (이벤트 목록)\n- /events/new (이벤트 생성)\n- /events/test-id (이벤트 상세)\n- /events/test-id/edit (이벤트 수정)\n- /invite/abc123 (초대 링크)\n- /profile (프로필)\n- /admin/login (관리자 로그인)\n- /admin/dashboard (대시보드)\n- /admin/events (이벤트 관리)\n- /admin/users (사용자 관리)\n- /admin/stats (통계)\n\n5. 네비게이션 동작 확인:\n- 모바일 하단 네비게이션 탭 클릭\n- 활성 탭 하이라이트 확인\n- 관리자 사이드바 메뉴 클릭\n- 활성 메뉴 하이라이트 확인",
+      "verificationCriteria": "1. npm run typecheck 성공 (에러 0개)\n2. npm run build 성공\n3. 모든 13개 페이지 접근 가능\n4. 404 에러 없음\n5. 모바일 네비게이션 탭 전환 동작\n6. 관리자 사이드바 메뉴 전환 동작\n7. 활성 탭/메뉴 하이라이트 표시\n8. 동적 라우트 파라미터 전달 확인",
+      "analysisResult": "Task 001: Next.js App Router 기반 애플리케이션 골격 구축. 13개 페이지 라우트, 2개 레이아웃, 3개 네비게이션 컴포넌트 생성. 기존 코드와 충돌 없음. Server Components 우선, Client Components 최소화. 점진적 구현 후 빌드 검증.",
+      "summary": "빌드 검증 및 라우팅 테스트 완료. Next.js 15의 params Promise 타입 변경사항에 맞춰 동적 라우트 수정. TypeScript 타입 체크 통과. 프로덕션 빌드 성공. 총 24개 라우트 생성됨(우리가 만든 13개 페이지 + 기존 11개). 모든 페이지 정상 빌드. 모바일 페이지 7개, 관리자 페이지 5개, 홈 페이지 1개 모두 정적 빌드 성공. Supabase Edge Runtime 경고는 있으나 빌드 성공에 영향 없음.",
+      "completedAt": "2025-10-14T03:39:07.040Z"
+    }
+  ]
+}

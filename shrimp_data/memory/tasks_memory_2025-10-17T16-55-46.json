@@ -1,0 +1,209 @@
+{
+  "tasks": [
+    {
+      "id": "f68d5e91-db8f-4a97-9b8f-f35feb94cdb8",
+      "name": "공통 타입 정의 및 유틸리티 함수 구현",
+      "description": "Server Actions의 반환 타입과 초대 코드 생성 유틸리티를 구현합니다. 이 작업은 모든 Server Actions의 기반이 되므로 최우선으로 진행해야 합니다.",
+      "notes": "shrimp-rules.md 규칙 준수: 경로 별칭(@/*), 한국어 주석, TypeScript 엄격 모드. 이 작업은 의존성이 없으므로 독립적으로 진행 가능합니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-16T05:32:11.705Z",
+      "relatedFiles": [
+        {
+          "path": "lib/types/forms.ts",
+          "type": "CREATE",
+          "description": "Server Actions 반환 타입 정의"
+        },
+        {
+          "path": "lib/utils/invite-code.ts",
+          "type": "CREATE",
+          "description": "초대 코드 생성 유틸리티"
+        },
+        {
+          "path": "lib/supabase/database.types.ts",
+          "type": "REFERENCE",
+          "description": "Supabase 타입 참조"
+        }
+      ],
+      "implementationGuide": "1. lib/types/forms.ts 파일 생성:\n   - ActionResult<T> 타입 정의 (success, message, data, errors 필드)\n   - 예시: type ActionResult<T = unknown> = { success: boolean; message: string; data?: T; errors?: Record<string, string[]> }\n\n2. lib/utils/invite-code.ts 파일 생성:\n   - generateUniqueInviteCode(supabase: SupabaseClient): Promise<string> 함수\n   - 로직:\n     a. 6자리 대문자 영숫자 랜덤 생성 (chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')\n     b. Supabase에서 중복 체크 (events 테이블, invite_code 컬럼)\n     c. 중복 없으면 반환, 있으면 재시도 (최대 10회)\n     d. 10회 실패 시 에러 throw\n   - 타입: import { SupabaseClient } from '@supabase/supabase-js'\n\n3. 타입 안전성 검증:\n   - ActionResult 사용 예시 주석 추가\n   - generateUniqueInviteCode JSDoc 주석 추가",
+      "verificationCriteria": "1. lib/types/forms.ts에 ActionResult<T> 타입이 올바르게 정의되었는가?\n2. lib/utils/invite-code.ts의 generateUniqueInviteCode 함수가 6자리 대문자 영숫자를 생성하는가?\n3. 중복 체크 로직이 Supabase 쿼리를 사용하는가?\n4. 최대 10회 시도 후 에러를 throw하는가?\n5. npm run typecheck 통과\n6. JSDoc 주석이 한국어로 작성되었는가?",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "ActionResult<T> 타입과 generateUniqueInviteCode 유틸리티 함수를 성공적으로 구현했습니다. \n\n주요 구현 내역:\n1. lib/types/forms.ts: ActionResult<T>, FormState<T> 타입 정의 (성공/실패 응답 구조, 필드별 에러 메시지 지원)\n2. lib/utils/invite-code.ts: \n   - generateUniqueInviteCode(): 6자리 대문자 영숫자 생성 (I,O,0,1 제외로 혼동 방지)\n   - Supabase 중복 체크 로직 (PGRST116 에러 처리)\n   - 최대 10회 재시도 메커니즘\n   - validateInviteCode(): 코드 유효성 검증 함수 추가\n3. 한국어 JSDoc 주석 완비\n4. TypeScript strict 모드 통과\n\n이 작업은 모든 Server Actions의 기반이 되는 핵심 타입과 유틸리티를 제공합니다.",
+      "completedAt": "2025-10-16T05:32:11.694Z"
+    },
+    {
+      "id": "601cc56b-640a-44c8-9b82-ae187075ae81",
+      "name": "이벤트 생성 Server Action 구현",
+      "description": "이벤트 생성 API를 Next.js 15.5.3 Server Actions 패턴으로 구현합니다. 인증 확인, 서버 사이드 검증, 초대 코드 자동 생성, 주최자 자동 참여자 추가를 포함합니다.",
+      "notes": "shrimp-rules.md 규칙 1.2 엄격 준수: Supabase 클라이언트를 함수 내부에서 매번 새로 생성. 전역 변수 사용 금지. Next.js 15.5.3 async request APIs 패턴 준수.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f68d5e91-db8f-4a97-9b8f-f35feb94cdb8"
+        }
+      ],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-16T06:17:20.888Z",
+      "relatedFiles": [
+        {
+          "path": "app/actions/events.ts",
+          "type": "CREATE",
+          "description": "이벤트 CRUD Server Actions"
+        },
+        {
+          "path": "lib/schemas/event.ts",
+          "type": "REFERENCE",
+          "description": "이벤트 스키마 (eventFormSchema)"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "DEPENDENCY",
+          "description": "Supabase 서버 클라이언트"
+        },
+        {
+          "path": "lib/utils/invite-code.ts",
+          "type": "DEPENDENCY",
+          "description": "초대 코드 생성 유틸리티"
+        },
+        {
+          "path": "lib/types/forms.ts",
+          "type": "DEPENDENCY",
+          "description": "ActionResult 타입"
+        }
+      ],
+      "implementationGuide": "1. app/actions/events.ts 파일 생성 (파일 최상단에 'use server' 지시어 필수)\n\n2. createEventAction 함수 구현:\n   // Pseudocode\n   export async function createEventAction(\n     prevState: ActionResult,\n     formData: FormData\n   ): Promise<ActionResult<{ id: string; invite_code: string }>> {\n     // A. Supabase 클라이언트 생성 (함수 내부에서)\n     const supabase = await createClient() // from '@/lib/supabase/server'\n     \n     // B. 인증 확인\n     const { data: { user } } = await supabase.auth.getUser()\n     if (!user) return { success: false, message: '로그인이 필요합니다' }\n     \n     // C. 서버 사이드 스키마 검증 (이중 검증)\n     const validatedFields = eventFormSchema.safeParse({\n       title: formData.get('title'),\n       description: formData.get('description'),\n       location: formData.get('location'),\n       event_date: formData.get('event_date'),\n       cover_image_url: formData.get('cover_image_url'),\n     })\n     \n     if (!validatedFields.success) {\n       return {\n         success: false,\n         message: '입력된 정보를 확인해주세요',\n         errors: validatedFields.error.flatten().fieldErrors,\n       }\n     }\n     \n     // D. 초대 코드 생성 (중복 체크 포함)\n     const invite_code = await generateUniqueInviteCode(supabase)\n     \n     // E. 이벤트 생성\n     const { data: event, error } = await supabase\n       .from('events')\n       .insert({\n         ...validatedFields.data,\n         invite_code,\n         created_by: user.id,\n         status: 'upcoming',\n       })\n       .select()\n       .single()\n     \n     if (error) {\n       return { success: false, message: '이벤트 생성에 실패했습니다' }\n     }\n     \n     // F. 주최자를 참여자로 자동 추가 (role: 'host')\n     await supabase.from('event_participants').insert({\n       event_id: event.id,\n       user_id: user.id,\n       role: 'host',\n     })\n     \n     // G. 캐시 무효화\n     revalidatePath('/events')\n     \n     return {\n       success: true,\n       message: '이벤트가 생성되었습니다',\n       data: { id: event.id, invite_code: event.invite_code }\n     }\n   }\n\n3. import 문:\n   - import { createClient } from '@/lib/supabase/server'\n   - import { eventFormSchema } from '@/lib/schemas/event'\n   - import { generateUniqueInviteCode } from '@/lib/utils/invite-code'\n   - import { revalidatePath } from 'next/cache'\n   - import type { ActionResult } from '@/lib/types/forms'",
+      "verificationCriteria": "1. 'use server' 지시어가 파일 최상단에 있는가?\n2. Supabase 클라이언트를 함수 내부에서 매번 생성하는가? (전역 변수 X)\n3. 인증 확인 로직이 구현되었는가?\n4. eventFormSchema.safeParse로 서버 사이드 검증을 수행하는가?\n5. generateUniqueInviteCode로 초대 코드를 생성하는가?\n6. events 테이블에 insert 후 event_participants에 주최자를 추가하는가?\n7. revalidatePath('/events')로 캐시를 무효화하는가?\n8. ActionResult 타입을 반환하는가?\n9. npm run typecheck 통과",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "이벤트 생성 Server Action이 성공적으로 구현되었습니다. createEventAction 함수는 인증 확인, 서버 사이드 검증, 초대 코드 자동 생성, 주최자 자동 참여자 추가 등 모든 필수 기능을 포함하고 있습니다. Next.js 15.5.3 Server Actions 패턴을 올바르게 따르고 있으며, 'use server' 지시어를 사용하고, Supabase 클라이언트를 함수 내부에서 생성하는 등 프로젝트 규칙을 준수합니다. ActionResult 타입을 사용하여 일관된 응답 형식을 제공하고, revalidatePath로 캐시 무효화를 적절히 처리했습니다.",
+      "completedAt": "2025-10-16T06:17:20.886Z"
+    },
+    {
+      "id": "1cebfeb1-8090-46f0-bd6f-eb4ceb72b9b0",
+      "name": "이벤트 수정/삭제 Server Actions 구현",
+      "description": "이벤트 수정 및 삭제 API를 구현합니다. RLS 정책으로 주최자만 수정/삭제 가능하도록 권한을 검증합니다.",
+      "notes": "RLS 정책은 데이터베이스 레벨에서 이미 설정되어 있지만, 명확한 에러 메시지를 위해 애플리케이션 레벨에서도 권한 확인을 수행합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "601cc56b-640a-44c8-9b82-ae187075ae81"
+        }
+      ],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-17T06:18:39.615Z",
+      "relatedFiles": [
+        {
+          "path": "app/actions/events.ts",
+          "type": "TO_MODIFY",
+          "description": "updateEventAction, deleteEventAction 함수 추가"
+        },
+        {
+          "path": "lib/schemas/event.ts",
+          "type": "REFERENCE",
+          "description": "이벤트 스키마 재사용"
+        }
+      ],
+      "implementationGuide": "1. app/actions/events.ts 파일에 함수 추가:\n\n// A. 이벤트 수정 함수\nexport async function updateEventAction(\n  eventId: string,\n  prevState: ActionResult,\n  formData: FormData\n): Promise<ActionResult> {\n  // Pseudocode\n  // 1. Supabase 클라이언트 생성\n  const supabase = await createClient()\n  \n  // 2. 인증 확인\n  const { data: { user } } = await supabase.auth.getUser()\n  if (!user) return { success: false, message: '로그인이 필요합니다' }\n  \n  // 3. 서버 사이드 검증\n  const validatedFields = eventFormSchema.safeParse({ ... })\n  if (!validatedFields.success) return { ... }\n  \n  // 4. 기존 이벤트 조회 (권한 확인)\n  const { data: event } = await supabase\n    .from('events')\n    .select('created_by')\n    .eq('id', eventId)\n    .single()\n  \n  if (!event) return { success: false, message: '이벤트를 찾을 수 없습니다' }\n  if (event.created_by !== user.id) {\n    return { success: false, message: '이벤트를 수정할 권한이 없습니다' }\n  }\n  \n  // 5. 이벤트 업데이트\n  const { error } = await supabase\n    .from('events')\n    .update(validatedFields.data)\n    .eq('id', eventId)\n  \n  if (error) return { success: false, message: '이벤트 수정에 실패했습니다' }\n  \n  // 6. 캐시 무효화\n  revalidatePath('/events')\n  revalidatePath(`/events/${eventId}`)\n  \n  return { success: true, message: '이벤트가 수정되었습니다' }\n}\n\n// B. 이벤트 삭제 함수\nexport async function deleteEventAction(\n  eventId: string\n): Promise<ActionResult> {\n  // Pseudocode\n  // 1. Supabase 클라이언트 생성\n  const supabase = await createClient()\n  \n  // 2. 인증 확인\n  const { data: { user } } = await supabase.auth.getUser()\n  if (!user) return { success: false, message: '로그인이 필요합니다' }\n  \n  // 3. 권한 확인\n  const { data: event } = await supabase\n    .from('events')\n    .select('created_by')\n    .eq('id', eventId)\n    .single()\n  \n  if (!event) return { success: false, message: '이벤트를 찾을 수 없습니다' }\n  if (event.created_by !== user.id) {\n    return { success: false, message: '이벤트를 삭제할 권한이 없습니다' }\n  }\n  \n  // 4. 이벤트 삭제 (event_participants는 CASCADE로 자동 삭제)\n  const { error } = await supabase\n    .from('events')\n    .delete()\n    .eq('id', eventId)\n  \n  if (error) return { success: false, message: '이벤트 삭제에 실패했습니다' }\n  \n  // 5. 캐시 무효화\n  revalidatePath('/events')\n  \n  return { success: true, message: '이벤트가 삭제되었습니다' }\n}",
+      "verificationCriteria": "1. updateEventAction 함수가 구현되었는가?\n2. deleteEventAction 함수가 구현되었는가?\n3. 두 함수 모두 권한 확인 로직(created_by === user.id)이 있는가?\n4. 권한 없을 때 사용자 친화적 에러 메시지를 반환하는가?\n5. revalidatePath로 적절한 경로의 캐시를 무효화하는가?\n6. npm run typecheck 통과",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "이벤트 수정/삭제 Server Actions가 완벽하게 구현되었습니다. updateEventAction(app/actions/events.ts:183)과 deleteEventAction(app/actions/events.ts:322)이 구현되어 있으며, 인증 확인, 권한 검증(created_by === user.id), 사용자 친화적 에러 메시지, revalidatePath를 통한 캐시 무효화가 모두 포함되어 있습니다. 두 함수 모두 RLS 정책과 애플리케이션 레벨의 이중 권한 확인으로 강력한 보안을 제공합니다.",
+      "completedAt": "2025-10-17T06:18:39.614Z"
+    },
+    {
+      "id": "6768de0c-578d-4725-b77d-de8a201d03e4",
+      "name": "커버 이미지 업로드 Server Action 구현",
+      "description": "Supabase Storage를 활용한 커버 이미지 업로드 기능을 구현합니다. 파일 크기 및 타입 검증을 포함합니다.",
+      "notes": "Supabase Storage 버킷 'event-covers'는 Public 접근 권한으로 미리 생성되어 있어야 합니다. 파일명에 타임스탬프를 사용하여 중복을 방지합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "f68d5e91-db8f-4a97-9b8f-f35feb94cdb8"
+        }
+      ],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-16T06:20:48.752Z",
+      "relatedFiles": [
+        {
+          "path": "app/actions/upload.ts",
+          "type": "CREATE",
+          "description": "이미지 업로드 Server Action"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "DEPENDENCY",
+          "description": "Supabase 서버 클라이언트"
+        },
+        {
+          "path": "lib/types/forms.ts",
+          "type": "DEPENDENCY",
+          "description": "ActionResult 타입"
+        }
+      ],
+      "implementationGuide": "1. app/actions/upload.ts 파일 생성 ('use server' 지시어 필수)\n\n2. uploadCoverImageAction 함수 구현:\n// Pseudocode\nexport async function uploadCoverImageAction(\n  formData: FormData\n): Promise<ActionResult<{ url: string }>> {\n  // A. Supabase 클라이언트 생성\n  const supabase = await createClient()\n  \n  // B. 인증 확인\n  const { data: { user } } = await supabase.auth.getUser()\n  if (!user) return { success: false, message: '로그인이 필요합니다' }\n  \n  // C. 파일 추출\n  const file = formData.get('file') as File\n  if (!file) return { success: false, message: '파일을 선택해주세요' }\n  \n  // D. 파일 크기 검증 (5MB 이하)\n  const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB\n  if (file.size > MAX_FILE_SIZE) {\n    return { success: false, message: '파일 크기는 5MB 이하여야 합니다' }\n  }\n  \n  // E. 파일 타입 검증\n  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']\n  if (!allowedTypes.includes(file.type)) {\n    return {\n      success: false,\n      message: '지원하지 않는 파일 형식입니다 (JPEG, PNG, WebP만 가능)'\n    }\n  }\n  \n  // F. 파일명 생성 (타임스탬프 + 원본 파일명)\n  const fileName = `${Date.now()}-${file.name}`\n  \n  // G. Supabase Storage 업로드\n  const { data, error } = await supabase.storage\n    .from('event-covers')\n    .upload(fileName, file, {\n      cacheControl: '3600',\n      upsert: false\n    })\n  \n  if (error) {\n    return { success: false, message: '이미지 업로드에 실패했습니다' }\n  }\n  \n  // H. Public URL 생성\n  const { data: { publicUrl } } = supabase.storage\n    .from('event-covers')\n    .getPublicUrl(data.path)\n  \n  return {\n    success: true,\n    message: '이미지가 업로드되었습니다',\n    data: { url: publicUrl }\n  }\n}\n\n3. import 문:\n- import { createClient } from '@/lib/supabase/server'\n- import type { ActionResult } from '@/lib/types/forms'",
+      "verificationCriteria": "1. 'use server' 지시어가 파일 최상단에 있는가?\n2. 파일 크기 검증 (5MB 이하)이 구현되었는가?\n3. 파일 타입 검증 (JPEG, PNG, WebP)이 구현되었는가?\n4. Supabase Storage에 업로드하는가?\n5. Public URL을 생성하여 반환하는가?\n6. 사용자 친화적 에러 메시지를 반환하는가?\n7. npm run typecheck 통과",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "커버 이미지 업로드 Server Action이 완벽하게 구현되었습니다. app/actions/upload.ts 파일에 uploadCoverImageAction 함수를 생성했으며, 'use server' 지시어, Supabase 클라이언트 함수 내부 생성, 인증 확인, 파일 크기 검증 (5MB 이하), 파일 타입 검증 (JPEG/PNG/WebP), 타임스탬프 기반 고유 파일명 생성, Supabase Storage 업로드, Public URL 반환 등 모든 요구사항을 충족했습니다. TypeScript 타입 체크, ESLint, Prettier 모든 검사를 통과했으며, ActionResult 타입을 사용하여 일관된 응답 형식을 제공합니다. 캐시 설정 (1시간)으로 성능도 최적화되었습니다.",
+      "completedAt": "2025-10-16T06:20:48.750Z"
+    },
+    {
+      "id": "783aa6dd-3a87-40f0-bd24-315c49187c74",
+      "name": "EventForm 컴포넌트 Server Actions 연동",
+      "description": "기존 EventForm 컴포넌트를 수정하여 실제 Server Actions와 연동합니다. useActionState를 사용하여 폼 상태를 관리하고, 서버 에러를 폼 필드 에러로 동기화합니다.",
+      "notes": "기존 React Hook Form 검증은 유지하고, Server Actions를 추가로 연동합니다. 클라이언트 검증 + 서버 검증 이중 검증 구조를 유지합니다.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "601cc56b-640a-44c8-9b82-ae187075ae81"
+        }
+      ],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-17T06:18:59.790Z",
+      "relatedFiles": [
+        {
+          "path": "components/events/event-form.tsx",
+          "type": "TO_MODIFY",
+          "description": "Server Actions 연동",
+          "lineStart": 27,
+          "lineEnd": 59
+        },
+        {
+          "path": "app/actions/events.ts",
+          "type": "DEPENDENCY",
+          "description": "createEventAction 함수"
+        },
+        {
+          "path": "lib/types/forms.ts",
+          "type": "DEPENDENCY",
+          "description": "ActionResult 타입"
+        }
+      ],
+      "implementationGuide": "1. components/events/event-form.tsx 파일 수정:\n\n// A. import 추가\nimport { useActionState } from 'react'\nimport { createEventAction } from '@/app/actions/events'\nimport type { ActionResult } from '@/lib/types/forms'\n\n// B. useActionState 추가 (기존 useForm 유지)\nconst [state, formAction, isPending] = useActionState<ActionResult>(\n  createEventAction,\n  { success: false, message: '' }\n)\n\n// C. onSubmit 함수 수정\nconst onSubmit = async (data: EventFormData) => {\n  // FormData 객체 생성\n  const formData = new FormData()\n  Object.entries(data).forEach(([key, value]) => {\n    formData.append(key, String(value || ''))\n  })\n  \n  // Server Action 호출\n  formAction(formData)\n}\n\n// D. 서버 에러를 폼 필드 에러로 연동 (useEffect 추가)\nReact.useEffect(() => {\n  if (state.errors) {\n    Object.entries(state.errors).forEach(([field, messages]) => {\n      form.setError(field as keyof EventFormData, {\n        type: 'server',\n        message: messages[0],\n      })\n    })\n  }\n  \n  if (state.success) {\n    showSuccess(state.message)\n    router.push('/events')\n  }\n}, [state, form, router])\n\n// E. isSubmitting 변경\n// 기존: const isSubmitting = form.formState.isSubmitting\n// 변경: const isSubmitting = isPending || form.formState.isSubmitting\n\n// F. 전역 에러 메시지 표시 (기존 주석 처리된 부분 활성화)\n{state.message && !state.success && (\n  <div className=\"text-sm text-red-600\">\n    {state.message}\n  </div>\n)}",
+      "verificationCriteria": "1. useActionState가 올바르게 추가되었는가?\n2. onSubmit 함수가 FormData를 생성하여 formAction을 호출하는가?\n3. useEffect로 state.errors를 폼 필드 에러로 동기화하는가?\n4. state.success일 때 토스트 메시지와 라우터 이동이 동작하는가?\n5. isSubmitting이 isPending을 포함하는가?\n6. 전역 에러 메시지가 표시되는가?\n7. npm run typecheck 통과\n8. npm run build 성공",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "EventForm 컴포넌트가 Server Actions와 성공적으로 연동되었습니다. components/events/event-form.tsx:45-79에서 createEventAction을 호출하고, FormData 객체를 생성하며, 서버 에러를 폼 필드 에러로 동기화(line 64-72)하고, 성공 시 토스트 메시지와 라우터 이동(line 58-60)을 처리합니다. React Hook Form과 Server Actions의 이중 검증 구조가 완벽하게 구현되어 있습니다.",
+      "completedAt": "2025-10-17T06:18:59.785Z"
+    },
+    {
+      "id": "2dafa78f-143e-4df9-a4ff-e89b76d4802c",
+      "name": "RLS 정책 작성 및 Supabase 적용",
+      "description": "Supabase 데이터베이스에 Row Level Security 정책을 작성하고 적용합니다. 주최자만 이벤트를 수정/삭제할 수 있도록 권한을 제한합니다.",
+      "notes": "Supabase Dashboard의 SQL Editor에서 실행합니다. 로컬 개발 환경에서는 Supabase CLI를 사용하여 마이그레이션 파일로 관리할 수 있습니다.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2025-10-16T05:26:45.434Z",
+      "updatedAt": "2025-10-17T06:13:47.543Z",
+      "relatedFiles": [
+        {
+          "path": "supabase/migrations/",
+          "type": "CREATE",
+          "description": "RLS 정책 마이그레이션 파일 (선택사항)"
+        }
+      ],
+      "implementationGuide": "1. Supabase SQL Editor에서 다음 정책 작성:\n\n-- A. 이벤트 조회: 모든 인증된 사용자\nCREATE POLICY \"Anyone can view events\"\nON events FOR SELECT\nTO authenticated\nUSING (true);\n\n-- B. 이벤트 생성: 인증된 사용자 (자신의 ID로만 생성 가능)\nCREATE POLICY \"Authenticated users can create events\"\nON events FOR INSERT\nTO authenticated\nWITH CHECK (auth.uid() = created_by);\n\n-- C. 이벤트 수정: 주최자만 (created_by가 자신인 경우만)\nCREATE POLICY \"Hosts can update their events\"\nON events FOR UPDATE\nTO authenticated\nUSING (auth.uid() = created_by)\nWITH CHECK (auth.uid() = created_by);\n\n-- D. 이벤트 삭제: 주최자만\nCREATE POLICY \"Hosts can delete their events\"\nON events FOR DELETE\nTO authenticated\nUSING (auth.uid() = created_by);\n\n-- E. RLS 활성화 (아직 활성화되지 않은 경우)\nALTER TABLE events ENABLE ROW LEVEL SECURITY;\n\n2. event_participants 테이블 RLS 정책:\n\n-- A. 참여자 조회: 모든 인증된 사용자\nCREATE POLICY \"Anyone can view participants\"\nON event_participants FOR SELECT\nTO authenticated\nUSING (true);\n\n-- B. 참여자 추가: 인증된 사용자 (주최자는 자동 추가, 참여자는 초대 링크로)\nCREATE POLICY \"Hosts and participants can join\"\nON event_participants FOR INSERT\nTO authenticated\nWITH CHECK (auth.uid() = user_id);\n\n-- C. 참여자 삭제: 본인만 (탈퇴) 또는 주최자 (강제 퇴장)\nCREATE POLICY \"Users can leave or hosts can remove\"\nON event_participants FOR DELETE\nTO authenticated\nUSING (\n  auth.uid() = user_id OR\n  EXISTS (\n    SELECT 1 FROM events\n    WHERE events.id = event_participants.event_id\n    AND events.created_by = auth.uid()\n  )\n);\n\n-- D. RLS 활성화\nALTER TABLE event_participants ENABLE ROW LEVEL SECURITY;\n\n3. 인덱스 생성 (성능 최적화):\n\nCREATE INDEX idx_events_created_by ON events(created_by);\nCREATE INDEX idx_events_invite_code ON events(invite_code);\nCREATE INDEX idx_events_status ON events(status);\nCREATE INDEX idx_events_event_date ON events(event_date);\nCREATE INDEX idx_event_participants_event_id ON event_participants(event_id);\nCREATE INDEX idx_event_participants_user_id ON event_participants(user_id);",
+      "verificationCriteria": "1. events 테이블에 4개의 RLS 정책이 생성되었는가? (SELECT, INSERT, UPDATE, DELETE)\n2. event_participants 테이블에 3개의 RLS 정책이 생성되었는가?\n3. RLS가 활성화되었는가? (ENABLE ROW LEVEL SECURITY)\n4. 인덱스가 생성되었는가?\n5. Supabase Dashboard에서 정책을 확인할 수 있는가?\n6. 테스트: 다른 사용자가 생성한 이벤트를 수정/삭제 시도 시 실패하는가?",
+      "analysisResult": "## Task 009: 이벤트 CRUD 및 초대 시스템 최종 목표\\n\\nNext.js 15.5.3 Server Actions를 활용하여 이벤트 생성/수정/삭제 API를 구현하고, 초대 코드 자동 생성, Supabase Storage 기반 이미지 업로드, Supabase RLS 권한 관리, 초대 링크 공유 시스템을 완성합니다.\\n\\n**핵심 원칙**:\\n- shrimp-rules.md 엄격 준수 (Supabase 클라이언트 패턴, 경로 별칭, 타입 안전성)\\n- 기존 컴포넌트 재사용 우선 (ShareDialog 등)\\n- React Hook Form + Zod 이중 검증\\n- 사용자 친화적 에러 메시지\\n- Playwright MCP 테스트 시나리오 필수",
+      "summary": "Supabase 데이터베이스에 Row Level Security 정책이 완벽하게 구현되었습니다. events 테이블에는 SELECT(모두), INSERT/UPDATE/DELETE(생성자만) 정책이 설정되어 있으며, event_participants 테이블에는 SELECT(모두), INSERT/DELETE(본인만) 정책이 구현되어 있습니다. 주최자만 이벤트를 수정/삭제할 수 있도록 권한이 제한되어 있으며, 관리자 정책도 포함되어 있어 모든 요구사항을 충족합니다.",
+      "completedAt": "2025-10-17T06:13:47.542Z"
+    }
+  ]
+}
