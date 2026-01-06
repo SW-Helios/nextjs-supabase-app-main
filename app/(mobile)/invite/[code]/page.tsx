@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Calendar, MapPin, Users, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getEventByInviteCode } from "@/lib/queries/events";
@@ -36,20 +36,14 @@ export default async function InvitePage({ params }: PageProps) {
     );
   }
 
-  // 인증 확인
+  // 인증 확인 (비로그인도 허용)
   const supabase = await createClient();
   const {
     data: { user },
-    error: authError,
   } = await supabase.auth.getUser();
 
-  // 로그인하지 않은 경우 리다이렉트 (redirect 쿼리 포함)
-  if (authError || !user) {
-    redirect(`/auth/login?redirect=/invite/${code}`);
-  }
-
-  // 초대 코드로 이벤트 조회 (userId 포함하여 참여 여부 확인)
-  const event = await getEventByInviteCode(code, user.id);
+  // 초대 코드로 이벤트 조회 (비로그인 시 userId 없이 조회)
+  const event = await getEventByInviteCode(code, user?.id);
 
   // 이벤트가 없는 경우
   if (!event) {
@@ -132,13 +126,26 @@ export default async function InvitePage({ params }: PageProps) {
 
           {/* 조건부 참여 버튼 */}
           <div className="pt-4">
-            {event.isParticipating ? (
+            {!user ? (
+              <div className="space-y-3">
+                <Button asChild className="w-full" size="lg">
+                  <Link href={`/events/${event.id}`}>자세히 보기</Link>
+                </Button>
+                <p className="text-muted-foreground text-center text-sm">
+                  참여하려면{" "}
+                  <Link href={`/auth/login?redirect=/invite/${code}`} className="text-primary underline">
+                    로그인
+                  </Link>
+                  이 필요합니다
+                </p>
+              </div>
+            ) : event.isParticipating ? (
               <div className="space-y-3">
                 <p className="text-muted-foreground text-center text-sm">
                   이미 참여한 이벤트입니다
                 </p>
                 <Button asChild className="w-full" size="lg">
-                  <Link href={`/events/${event.id}`}>이벤트 보기</Link>
+                  <Link href={`/events/${event.id}`}>자세히 보기</Link>
                 </Button>
               </div>
             ) : (

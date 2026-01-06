@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CommentList } from "./comment-list";
@@ -10,7 +11,7 @@ import type { CommentWithUser } from "@/lib/types/models";
 interface CommentSectionProps {
   eventId: string;
   comments: CommentWithUser[];
-  currentUserId: string;
+  currentUserId?: string;
   isAdmin: boolean;
 }
 
@@ -30,8 +31,18 @@ export function CommentSection({ eventId, comments, currentUserId, isAdmin }: Co
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* 댓글 작성 폼 */}
-        <CommentForm eventId={eventId} />
+        {/* 댓글 작성 폼 (로그인 사용자만) */}
+        {currentUserId ? (
+          <CommentForm eventId={eventId} />
+        ) : (
+          <p className="text-muted-foreground text-center text-sm py-2">
+            댓글을 작성하려면{" "}
+            <Link href="/auth/login" className="text-primary underline">
+              로그인
+            </Link>
+            이 필요합니다
+          </p>
+        )}
 
         {/* 구분선 */}
         <div className="border-t" />

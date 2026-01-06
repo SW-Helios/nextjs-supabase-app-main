@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Calendar, MapPin, Users, Edit, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,16 +24,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   // Next.js 15: params는 Promise 타입
   const { id } = await params;
 
-  // 인증 확인
+  // 인증 확인 (비로그인도 허용)
   const supabase = await createClient();
   const {
     data: { user },
-    error: authError,
   } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/auth/login");
-  }
 
   // 이벤트 데이터 조회
   const event = await getEventDetail(id);
@@ -43,16 +38,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // 현재 사용자가 호스트인지 확인
-  const isHost = await isUserHost(user.id, id);
+  // 현재 사용자가 호스트인지 확인 (비로그인 시 false)
+  const isHost = user ? await isUserHost(user.id, id) : false;
 
-  // 관리자 여부 확인
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  const isAdmin = profile?.role === "admin";
+  // 관리자 여부 확인 (비로그인 시 false)
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isAdmin = profile?.role === "admin";
+  }
 
   // 댓글 목록 조회
   const comments = await getEventComments(id);
@@ -192,7 +190,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       </Card>
 
       {/* 댓글 섹션 */}
-      <CommentSection eventId={id} comments={comments} currentUserId={user.id} isAdmin={isAdmin} />
+      <CommentSection eventId={id} comments={comments} currentUserId={user?.id} isAdmin={isAdmin} />
     </div>
   );
 }

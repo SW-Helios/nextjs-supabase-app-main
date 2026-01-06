@@ -7,7 +7,7 @@ import type { CommentWithUser } from "@/lib/types/models";
 interface CommentListProps {
   comments: CommentWithUser[];
   eventId: string;
-  currentUserId: string;
+  currentUserId?: string;
   isAdmin: boolean;
 }
 

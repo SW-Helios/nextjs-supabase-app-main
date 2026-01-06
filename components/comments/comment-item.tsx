@@ -26,7 +26,7 @@ import type { CommentWithUser } from "@/lib/types/models";
 interface CommentItemProps {
   comment: CommentWithUser;
   eventId: string;
-  currentUserId: string;
+  currentUserId?: string;
   isAdmin: boolean;
 }
 
@@ -42,8 +42,8 @@ export function CommentItem({ comment, eventId, currentUserId, isAdmin }: Commen
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 권한 확인: 작성자 본인 또는 관리자
-  const isAuthor = comment.user_id === currentUserId;
+  // 권한 확인: 작성자 본인 또는 관리자 (비로그인 시 모두 false)
+  const isAuthor = currentUserId ? comment.user_id === currentUserId : false;
   const canModify = isAuthor; // 수정은 작성자만
   const canDelete = isAuthor || isAdmin; // 삭제는 작성자 또는 관리자
 
