@@ -9,9 +9,60 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JoinButton } from "@/components/events/join-button";
+import type { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{ code: string }>;
+}
+
+/**
+ * 동적 메타데이터 생성 (카카오톡/SNS 미리보기용)
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { code } = await params;
+
+  if (!code || code.trim() === "") {
+    return {
+      title: "잘못된 초대 링크",
+    };
+  }
+
+  const event = await getEventByInviteCode(code);
+
+  if (!event) {
+    return {
+      title: "이벤트를 찾을 수 없습니다",
+    };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nextjs-supabase-app-main.vercel.app";
+
+  return {
+    title: `${event.title} - 이벤트 초대`,
+    description: event.description || `${event.host.username}님이 초대했습니다. ${event.location}에서 만나요!`,
+    openGraph: {
+      title: event.title,
+      description: event.description || `${event.host.username}님이 초대했습니다`,
+      type: "website",
+      url: `${baseUrl}/invite/${code}`,
+      images: event.cover_image_url
+        ? [
+            {
+              url: event.cover_image_url,
+              width: 1200,
+              height: 630,
+              alt: event.title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: event.title,
+      description: event.description || `${event.host.username}님이 초대했습니다`,
+      images: event.cover_image_url ? [event.cover_image_url] : undefined,
+    },
+  };
 }
 
 /**
