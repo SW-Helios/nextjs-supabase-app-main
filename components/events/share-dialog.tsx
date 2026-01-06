@@ -63,30 +63,18 @@ export function ShareDialog({ open, onOpenChange, inviteCode, eventTitle }: Shar
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* 초대 코드 */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">초대 코드</label>
-            <div className="flex items-center gap-2">
-              <code className="bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm">
-                {inviteCode}
-              </code>
-            </div>
-          </div>
-
-          {/* 초대 링크 */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">초대 링크</label>
-            <div className="flex items-center gap-2">
-              <Input value={inviteUrl} readOnly className="font-mono text-sm" />
-              <Button type="button" size="icon" variant="outline" onClick={handleCopy}>
-                {copied ? (
-                  <Check className="h-4 w-4 text-green-600" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+        {/* 초대 링크 */}
+        <div>
+          <label className="mb-2 block text-sm font-medium">초대 링크</label>
+          <div className="flex items-center gap-2">
+            <Input value={inviteUrl} readOnly className="font-mono text-sm" />
+            <Button type="button" size="icon" variant="outline" onClick={handleCopy}>
+              {copied ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
           </div>
         </div>
 
