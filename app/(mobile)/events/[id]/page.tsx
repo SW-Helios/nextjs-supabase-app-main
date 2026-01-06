@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import { Calendar, MapPin, Users, Edit, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { EventActionButtons } from "@/components/events/event-action-buttons";
+import { EventStatusBadge } from "@/components/events/event-status-badge";
 import { CommentSection } from "@/components/comments/comment-section";
 import { StaticMap } from "@/components/maps/static-map";
 import { getEventDetail, isUserHost } from "@/lib/queries/events";
@@ -55,19 +56,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   // 댓글 목록 조회
   const comments = await getEventComments(id);
 
-  // 상태별 배지
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge variant="default">진행 중</Badge>;
-      case "completed":
-        return <Badge variant="outline">종료</Badge>;
-      case "cancelled":
-        return <Badge variant="destructive">취소됨</Badge>;
-      default:
-        return null;
-    }
-  };
+  // 호스트 또는 관리자만 상태 변경 가능
+  const canChangeStatus = isHost || isAdmin;
 
   return (
     <div className="space-y-6 pb-8">
@@ -88,7 +78,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-3xl font-bold">{event.title}</h1>
-          {getStatusBadge(event.status)}
+          <EventStatusBadge
+            eventId={id}
+            status={event.status as "active" | "completed" | "cancelled"}
+            canChangeStatus={canChangeStatus}
+          />
         </div>
         {event.description && <p className="text-muted-foreground">{event.description}</p>}
       </div>

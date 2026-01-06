@@ -600,6 +600,103 @@ export async function joinEventByInviteCodeAction(
  * }
  * ```
  */
+/**
+ * 이벤트 상태 변경 Server Action
+ *
+ * 이벤트 상태를 변경합니다. 호스트 또는 관리자만 변경할 수 있습니다.
+ *
+ * @param eventId - 변경할 이벤트 ID
+ * @param newStatus - 새로운 상태 ('active' | 'completed' | 'cancelled')
+ * @returns Promise<ActionResult> - 변경 결과
+ */
+export async function updateEventStatusAction(
+  eventId: string,
+  newStatus: "active" | "completed" | "cancelled"
+): Promise<ActionResult> {
+  try {
+    // A. Supabase 클라이언트 생성
+    const supabase = await createClient();
+
+    // B. 인증 확인
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        message: "로그인이 필요합니다.",
+      };
+    }
+
+    // C. 이벤트 존재 여부 확인
+    const { data: existingEvent, error: fetchError } = await supabase
+      .from("events")
+      .select("id, created_by, title, status")
+      .eq("id", eventId)
+      .single();
+
+    if (fetchError || !existingEvent) {
+      return {
+        success: false,
+        message: "이벤트를 찾을 수 없습니다.",
+      };
+    }
+
+    // D. 권한 확인 (호스트 또는 관리자)
+    const isHost = existingEvent.created_by === user.id;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const isAdmin = profile?.role === "admin";
+
+    if (!isHost && !isAdmin) {
+      return {
+        success: false,
+        message: "이벤트 상태를 변경할 권한이 없습니다.",
+      };
+    }
+
+    // E. 상태 업데이트
+    const { error: updateError } = await supabase
+      .from("events")
+      .update({
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", eventId);
+
+    if (updateError) {
+      return {
+        success: false,
+        message: `상태 변경에 실패했습니다: ${updateError.message}`,
+      };
+    }
+
+    // F. 캐시 무효화
+    revalidatePath("/events");
+    revalidatePath(`/events/${eventId}`);
+
+    const statusText = newStatus === "completed" ? "종료" : newStatus === "active" ? "진행 중" : "취소";
+
+    return {
+      success: true,
+      message: `이벤트가 "${statusText}" 상태로 변경되었습니다.`,
+    };
+  } catch (error) {
+    console.error("이벤트 상태 변경 중 예외 발생:", error);
+    return {
+      success: false,
+      message: "이벤트 상태 변경 중 오류가 발생했습니다.",
+    };
+  }
+}
+
 export async function deleteEventAction(eventId: string): Promise<ActionResult> {
   try {
     // A. Supabase 클라이언트 생성
