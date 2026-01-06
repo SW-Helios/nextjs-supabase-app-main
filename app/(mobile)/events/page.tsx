@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EventCard } from "@/components/events/event-card";
 import { createClient } from "@/lib/supabase/server";
-import { getUserHostedEvents, getUserParticipatingEvents } from "@/lib/queries/events";
+import {
+  getUserHostedEvents,
+  getUserParticipatingEvents,
+  getActiveEvents,
+} from "@/lib/queries/events";
 
 /**
  * 이벤트 목록 페이지 (Server Component)
@@ -26,8 +30,20 @@ export default async function EventsPage() {
   }
 
   // B. 이벤트 데이터 조회
-  const hostedEventsWithHost = await getUserHostedEvents(user.id);
-  const participatingEventsWithHost = await getUserParticipatingEvents(user.id);
+  const [hostedEventsWithHost, participatingEventsWithHost, activeEvents] = await Promise.all([
+    getUserHostedEvents(user.id),
+    getUserParticipatingEvents(user.id),
+    getActiveEvents(20),
+  ]);
+
+  // 내가 만들거나 참여한 이벤트 ID 목록 (진행중인 이벤트에서 제외용)
+  const myEventIds = new Set([
+    ...hostedEventsWithHost.map((e) => e.id),
+    ...participatingEventsWithHost.map((e) => e.id),
+  ]);
+
+  // 진행중인 이벤트에서 내 이벤트 제외
+  const otherActiveEvents = activeEvents.filter((e) => !myEventIds.has(e.id));
 
   // 호스팅 이벤트가 있을 때만 FAB 표시
   const showFAB = hostedEventsWithHost.length > 0;
@@ -69,15 +85,10 @@ export default async function EventsPage() {
         )}
       </section>
 
-      {/* 내가 참여한 이벤트 */}
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">내가 참여한 이벤트</h2>
-        {participatingEventsWithHost.length === 0 ? (
-          <EmptyState
-            title="참여한 이벤트가 없어요"
-            description="초대 코드로 이벤트에 참여해보세요!"
-          />
-        ) : (
+      {/* 내가 참여한 이벤트 - 참여한 이벤트가 있을 때만 표시 */}
+      {participatingEventsWithHost.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold">내가 참여한 이벤트</h2>
           <div className="grid gap-4">
             {participatingEventsWithHost.map((event) => (
               <Link key={event.id} href={`/events/${event.id}`}>
@@ -85,8 +96,22 @@ export default async function EventsPage() {
               </Link>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {/* 진행중인 이벤트 (내 이벤트 제외) */}
+      {otherActiveEvents.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold">진행중인 이벤트</h2>
+          <div className="grid gap-4">
+            {otherActiveEvents.map((event) => (
+              <Link key={event.id} href={`/events/${event.id}`}>
+                <EventCard event={event} variant="compact" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* FAB (Floating Action Button) - 하단 네비게이션 위 */}
       {/* 호스팅 이벤트가 있을 때만 표시 */}

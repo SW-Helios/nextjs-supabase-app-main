@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, PlusCircle, User } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Home, Calendar, PlusCircle, User, Sun, Moon } from "lucide-react";
 import type { NavItem } from "@/lib/types";
 
 const navItems: NavItem[] = [
@@ -14,6 +16,17 @@ const navItems: NavItem[] = [
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // 하이드레이션 이슈 방지
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -46,6 +59,31 @@ export function MobileNav() {
             </Link>
           );
         })}
+
+        {/* 다크모드 토글 버튼 */}
+        <button
+          onClick={toggleTheme}
+          className="flex h-full flex-1 flex-col items-center justify-center gap-1"
+          aria-label="테마 전환"
+        >
+          {mounted ? (
+            <>
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <Moon className="h-5 w-5 text-muted-foreground" />
+              )}
+              <span className="text-muted-foreground text-xs">
+                {theme === "dark" ? "라이트" : "다크"}
+              </span>
+            </>
+          ) : (
+            <>
+              <Moon className="h-5 w-5 text-muted-foreground" />
+              <span className="text-muted-foreground text-xs">다크</span>
+            </>
+          )}
+        </button>
       </div>
     </nav>
   );
