@@ -27,12 +27,12 @@ export function EventCard({
   // 상태별 배지 색상
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "upcoming":
-        return <Badge variant="default">예정</Badge>;
-      case "ongoing":
-        return <Badge variant="secondary">진행 중</Badge>;
-      case "ended":
+      case "active":
+        return <Badge variant="default">진행 중</Badge>;
+      case "completed":
         return <Badge variant="outline">종료</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">취소됨</Badge>;
       default:
         return null;
     }

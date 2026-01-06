@@ -62,6 +62,10 @@ export function ParticipantCard({
 
   const styles = sizeStyles[size];
 
+  // 고정 참여자인 경우 participant_name 사용, 실제 사용자인 경우 user 정보 사용
+  const displayName = participant.participant_name || participant.user?.username || "알 수 없음";
+  const avatarUrl = participant.user?.avatar_url ?? undefined;
+
   return (
     <div
       className={cn(
@@ -71,19 +75,14 @@ export function ParticipantCard({
     >
       {/* 아바타 */}
       <Avatar className={styles.avatar}>
-        <AvatarImage
-          src={participant.user.avatar_url ?? undefined}
-          alt={participant.user.username ?? ""}
-        />
-        <AvatarFallback className={styles.avatarText}>
-          {getInitials(participant.user.username)}
-        </AvatarFallback>
+        <AvatarImage src={avatarUrl} alt={displayName} />
+        <AvatarFallback className={styles.avatarText}>{getInitials(displayName)}</AvatarFallback>
       </Avatar>
 
       {/* 정보 */}
       <div className="flex flex-1 items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className={cn("truncate font-medium", styles.name)}>{participant.user.username}</p>
+          <p className={cn("truncate font-medium", styles.name)}>{displayName}</p>
           {showRole && (
             <p className={cn("text-muted-foreground", styles.role)}>
               {participant.role === "host" ? "호스트" : "참여자"}

@@ -154,14 +154,14 @@ export interface BaseQueryParams {
  *
  * 관리자 이벤트 관리 테이블에서 사용하는 쿼리 파라미터입니다.
  *
- * @property statusFilter - 상태 필터 ('all' | 'upcoming' | 'ongoing' | 'ended')
+ * @property statusFilter - 상태 필터 ('all' | 'active' | 'cancelled' | 'completed')
  * @property sortBy - 정렬 기준 필드
  *
  * @example
  * ```typescript
  * const params: EventQueryParams = {
  *   searchQuery: '개발',
- *   statusFilter: 'upcoming',
+ *   statusFilter: 'active',
  *   sortBy: 'event_date',
  *   sortOrder: 'asc',
  *   page: 1,
@@ -170,7 +170,7 @@ export interface BaseQueryParams {
  * ```
  */
 export interface EventQueryParams extends BaseQueryParams {
-  statusFilter?: "all" | "upcoming" | "ongoing" | "ended";
+  statusFilter?: "all" | "active" | "cancelled" | "completed";
   sortBy?: EventSortField;
 }
 

@@ -127,7 +127,7 @@ export async function getEventStatsAction(): Promise<ActionResult<EventStats>> {
  * ```typescript
  * const result = await getAdminEventsAction({
  *   searchQuery: '개발',
- *   statusFilter: 'upcoming',
+ *   statusFilter: 'active',
  *   sortBy: 'event_date',
  *   sortOrder: 'asc',
  *   page: 1,

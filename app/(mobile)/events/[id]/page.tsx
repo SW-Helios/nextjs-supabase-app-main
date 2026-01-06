@@ -7,7 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EventActionButtons } from "@/components/events/event-action-buttons";
+import { CommentSection } from "@/components/comments/comment-section";
+import { StaticMap } from "@/components/maps/static-map";
 import { getEventDetail, isUserHost } from "@/lib/queries/events";
+import { getEventComments } from "@/lib/queries/comments";
 import { formatDate, getInitials } from "@/lib/utils/format";
 import { createClient } from "@/lib/supabase/server";
 import type { ParticipantWithUser } from "@/lib/types/models";
@@ -42,6 +45,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   // 현재 사용자가 호스트인지 확인
   const isHost = await isUserHost(user.id, id);
+
+  // 관리자 여부 확인
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+
+  // 댓글 목록 조회
+  const comments = await getEventComments(id);
 
   // 상태별 배지
   const getStatusBadge = (status: string) => {
@@ -110,14 +124,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="flex items-start gap-3">
-            <MapPin className="text-muted-foreground mt-0.5 h-5 w-5" />
-            <div>
-              <p className="text-muted-foreground text-sm">장소</p>
-              <p className="font-medium">{event.location}</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
             <Users className="text-muted-foreground mt-0.5 h-5 w-5" />
             <div>
               <p className="text-muted-foreground text-sm">참여자</p>
@@ -127,18 +133,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         </CardContent>
       </Card>
 
-      {/* 초대 코드 카드 */}
+      {/* 장소 및 지도 카드 */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-2">
-            <p className="text-muted-foreground text-sm">초대 코드</p>
-            <div className="flex items-center gap-2">
-              <code className="bg-muted flex-1 rounded-md px-3 py-2 font-mono text-sm">
-                {event.invite_code}
-              </code>
-            </div>
-            <p className="text-muted-foreground text-xs">이 코드로 다른 사람을 초대할 수 있어요</p>
+        <CardContent className="space-y-3 pt-6">
+          <div className="flex items-center gap-2">
+            <MapPin className="text-primary h-5 w-5" />
+            <h2 className="font-semibold">장소</h2>
           </div>
+          <StaticMap
+            address={event.location}
+            latitude={event.latitude}
+            longitude={event.longitude}
+            height="h-48"
+          />
         </CardContent>
       </Card>
 
@@ -183,6 +190,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           </div>
         </CardContent>
       </Card>
+
+      {/* 댓글 섹션 */}
+      <CommentSection eventId={id} comments={comments} currentUserId={user.id} isAdmin={isAdmin} />
     </div>
   );
 }

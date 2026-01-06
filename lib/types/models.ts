@@ -36,12 +36,28 @@ export type User = Database["public"]["Tables"]["profiles"]["Row"];
  * @property event_date - 이벤트 일시
  * @property cover_image_url - 커버 이미지 URL
  * @property invite_code - 초대 코드 (고유)
- * @property status - 이벤트 상태 ('upcoming' | 'ongoing' | 'ended')
+ * @property status - 이벤트 상태 ('active' | 'cancelled' | 'completed')
+ * @property max_participants - 최대 참여자 수 (기본 30명, 최대 100명)
  * @property created_by - 이벤트 생성자 ID (profiles.id 참조)
  * @property created_at - 이벤트 생성 일시
  * @property updated_at - 이벤트 수정 일시
  */
 export type Event = Database["public"]["Tables"]["events"]["Row"];
+
+/**
+ * 이벤트 상태 타입
+ */
+export type EventStatus = "active" | "cancelled" | "completed";
+
+/**
+ * 사용자 역할 타입
+ */
+export type UserRole = "user" | "admin";
+
+/**
+ * 참여자 역할 타입
+ */
+export type ParticipantRole = "host" | "participant";
 
 /**
  * 이벤트 참여자 관계 모델
@@ -75,9 +91,10 @@ export interface EventWithHost extends Event {
  * 참여자 목록 표시 시 사용하는 확장 타입입니다.
  *
  * @property user - 참여자 사용자 정보 (id, username, avatar_url만 포함)
+ * @property participant_name - 고정 참여자의 경우 이름
  */
 export interface ParticipantWithUser extends EventParticipant {
-  user: Pick<User, "id" | "username" | "avatar_url">;
+  user?: Pick<User, "id" | "username" | "avatar_url"> | null;
 }
 
 /**
@@ -90,4 +107,30 @@ export interface ParticipantWithUser extends EventParticipant {
  */
 export interface EventDetail extends EventWithHost {
   participants: ParticipantWithUser[];
+}
+
+/**
+ * 이벤트 댓글 데이터 모델
+ *
+ * 이벤트에 달린 댓글 정보를 나타냅니다.
+ *
+ * @property id - 댓글 고유 식별자
+ * @property event_id - 이벤트 ID (events.id 참조)
+ * @property user_id - 작성자 ID (profiles.id 참조)
+ * @property content - 댓글 내용 (최대 1000자)
+ * @property image_urls - 첨부 이미지 URL 배열 (최대 3개)
+ * @property created_at - 댓글 작성 일시
+ * @property updated_at - 댓글 수정 일시
+ */
+export type EventComment = Database["public"]["Tables"]["event_comments"]["Row"];
+
+/**
+ * 작성자 정보를 포함한 댓글 모델
+ *
+ * 댓글 목록 표시 시 사용하는 확장 타입입니다.
+ *
+ * @property user - 작성자 정보 (id, username, avatar_url만 포함)
+ */
+export interface CommentWithUser extends EventComment {
+  user: Pick<User, "id" | "username" | "avatar_url">;
 }

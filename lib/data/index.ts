@@ -44,10 +44,10 @@ export function getEventById(id: string): Event | undefined {
 /**
  * 상태별 이벤트 목록 조회
  *
- * @param status - 이벤트 상태 ('upcoming' | 'ongoing' | 'ended')
+ * @param status - 이벤트 상태 ('active' | 'cancelled' | 'completed')
  * @returns 해당 상태의 이벤트 배열
  */
-export function getEventsByStatus(status: "upcoming" | "ongoing" | "ended"): Event[] {
+export function getEventsByStatus(status: "active" | "cancelled" | "completed"): Event[] {
   return dummyEvents.filter((event) => event.status === status);
 }
 
@@ -62,19 +62,23 @@ export function getEventParticipants(eventId: string): ParticipantWithUser[] {
 
   return participants
     .map((participant) => {
-      const user = getUserById(participant.user_id);
-      if (!user) return null;
+      const user = participant.user_id ? getUserById(participant.user_id) : null;
+      if (!user && !participant.participant_name) return null;
 
-      return {
+      const result: ParticipantWithUser = {
         ...participant,
-        user: {
-          id: user.id,
-          username: user.username,
-          avatar_url: user.avatar_url,
-        },
+        user: user
+          ? {
+              id: user.id,
+              username: user.username,
+              avatar_url: user.avatar_url,
+            }
+          : null,
       };
+
+      return result;
     })
-    .filter((p): p is ParticipantWithUser => p !== null);
+    .filter((p) => p !== null) as ParticipantWithUser[];
 }
 
 /**
@@ -92,16 +96,16 @@ export function getUserEvents(userId: string): Event[] {
 }
 
 /**
- * 예정된 이벤트 목록 조회 (최신순)
+ * 진행 중인 이벤트 목록 조회 (최신순)
  *
  * @param limit - 반환할 최대 개수 (기본값: 전체)
- * @returns 예정된 이벤트 배열 (최신순)
+ * @returns 진행 중인 이벤트 배열 (최신순)
  */
 export function getUpcomingEvents(limit?: number): Event[] {
-  const upcoming = getEventsByStatus("upcoming");
+  const active = getEventsByStatus("active");
 
   // 이벤트 날짜 기준으로 정렬 (가까운 순)
-  const sorted = upcoming.sort(
+  const sorted = active.sort(
     (a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
   );
 
@@ -180,10 +184,10 @@ export function getUserHostedEvents(userId: string): Event[] {
  * @returns 최근 종료된 이벤트 배열
  */
 export function getRecentEndedEvents(limit: number = 5): Event[] {
-  const ended = getEventsByStatus("ended");
+  const completed = getEventsByStatus("completed");
 
   // 이벤트 날짜 기준으로 정렬 (최근 종료순)
-  const sorted = ended.sort(
+  const sorted = completed.sort(
     (a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
   );
 
@@ -196,7 +200,7 @@ export function getRecentEndedEvents(limit: number = 5): Event[] {
  * @returns 진행 중인 이벤트 배열
  */
 export function getOngoingEvents(): Event[] {
-  return getEventsByStatus("ongoing");
+  return getEventsByStatus("active");
 }
 
 /**

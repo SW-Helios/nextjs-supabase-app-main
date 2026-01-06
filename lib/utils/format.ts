@@ -45,6 +45,45 @@ export function formatDateShort(dateString: string): string {
 }
 
 /**
+ * 상대적 시간 표시 (예: "5분 전", "2시간 전")
+ *
+ * @param dateString - ISO 8601 형식의 날짜 문자열
+ * @returns 상대적 시간 문자열
+ *
+ * @example
+ * formatRelativeTime("2025-01-15T10:00:00.000Z")
+ * // => "5분 전" 또는 "2시간 전" 등
+ */
+export function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
+  const diffMonths = Math.floor(diffDays / 30);
+  const diffYears = Math.floor(diffDays / 365);
+
+  if (diffSeconds < 60) {
+    return "방금 전";
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes}분 전`;
+  } else if (diffHours < 24) {
+    return `${diffHours}시간 전`;
+  } else if (diffDays < 7) {
+    return `${diffDays}일 전`;
+  } else if (diffWeeks < 4) {
+    return `${diffWeeks}주 전`;
+  } else if (diffMonths < 12) {
+    return `${diffMonths}개월 전`;
+  } else {
+    return `${diffYears}년 전`;
+  }
+}
+
+/**
  * 닉네임에서 이니셜 추출 (최대 2자리)
  *
  * 한글: 첫 2글자 (예: "김민준" → "김민", "코치타임" → "코치")

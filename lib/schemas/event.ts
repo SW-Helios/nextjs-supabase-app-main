@@ -13,6 +13,7 @@ import { z } from "zod";
  * - title: 2-100자 제목
  * - location: 1-200자 장소
  * - event_date: 미래 날짜만 허용
+ * - participant_ids: 참여자 ID 목록 (최소 1명)
  *
  * 선택 필드:
  * - description: 최대 500자 설명
@@ -35,6 +36,10 @@ export const eventFormSchema = z.object({
     .min(1, { message: "장소를 입력해주세요." })
     .max(200, { message: "장소는 최대 200자까지 입력 가능합니다." }),
 
+  // 네이버 지도 좌표 (선택 필드)
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+
   event_date: z
     .string()
     .min(1, { message: "이벤트 날짜를 선택해주세요." })
@@ -52,6 +57,11 @@ export const eventFormSchema = z.object({
     .url({ message: "올바른 URL 형식을 입력해주세요." })
     .optional()
     .or(z.literal("")),
+
+  participant_ids: z
+    .array(z.string())
+    .min(1, { message: "최소 1명 이상의 참여자를 선택해주세요." })
+    .max(6, { message: "최대 6명까지 선택 가능합니다." }),
 });
 
 /**

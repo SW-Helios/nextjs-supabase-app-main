@@ -45,47 +45,50 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  // Check if accessing admin routes
+  // =============================================
+  // 관리자 페이지 접근 제어
+  // =============================================
+  // 테스트 시나리오:
+  // 1. 미인증 사용자 → /admin/login 리다이렉트
+  // 2. 일반 사용자 (인증됨, role !== 'admin') → / 리다이렉트
+  // 3. 관리자 사용자 (role === 'admin') → 정상 접근
+  // =============================================
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    // Allow access to admin login page
+    // /admin/login 페이지는 항상 접근 허용
     if (request.nextUrl.pathname === "/admin/login") {
       return supabaseResponse;
     }
 
-    // Check if user is authenticated
+    // 시나리오 1: 미인증 사용자 → /admin/login 리다이렉트
     if (!user) {
-      console.log("no user, redirecting to admin login page");
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
 
-    // Check if user has admin role
+    // 관리자 권한 확인
     const { data: profile, error } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.sub)
       .single();
 
-    console.log("Admin check - user.sub:", user.sub);
-    console.log("Admin check - profile:", profile);
-    console.log("Admin check - error:", error);
-
+    // 프로필 조회 실패 시 홈으로 리다이렉트
     if (error) {
-      console.error("Error fetching profile:", error);
+      console.error("[Admin] 프로필 조회 실패:", error.message);
       const url = request.nextUrl.clone();
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
 
+    // 시나리오 2: 일반 사용자 (인증됨, role !== 'admin') → / 리다이렉트
     if (profile?.role !== "admin") {
-      console.log("user is not admin, redirecting to home page. role:", profile?.role);
       const url = request.nextUrl.clone();
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
 
-    console.log("Admin access granted");
+    // 시나리오 3: 관리자 사용자 → 정상 접근 (아래로 통과)
   }
 
   if (

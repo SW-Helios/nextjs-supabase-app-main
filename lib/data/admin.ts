@@ -68,20 +68,20 @@ export const userTrendData: ChartDataPoint[] = Array.from({ length: 30 }, (_, i)
 /**
  * 이벤트 상태별 분포 차트 데이터
  *
- * 이벤트의 현재 상태(예정/진행중/종료)별 개수입니다.
+ * 이벤트의 현재 상태(진행중/종료/취소)별 개수입니다.
  */
 export const eventStatusData = [
   {
-    name: "예정",
-    value: 10, // upcoming events
-  },
-  {
     name: "진행 중",
-    value: 5, // ongoing events
+    value: 15, // active events
   },
   {
     name: "종료",
-    value: 5, // ended events
+    value: 5, // completed events
+  },
+  {
+    name: "취소됨",
+    value: 0, // cancelled events
   },
 ];
 

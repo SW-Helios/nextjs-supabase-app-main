@@ -12,9 +12,7 @@ export default function Home() {
             Gather
           </h1>
           <p className="text-muted-foreground text-base leading-relaxed">
-            초대 링크 하나로 모든 것을 해결하는
-            <br />
-            일회성 이벤트 관리 플랫폼
+            에이모를 떠난 자들의 모임
           </p>
         </div>
 

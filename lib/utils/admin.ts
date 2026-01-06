@@ -87,3 +87,134 @@ export async function verifyAdminAccess(): Promise<AdminAccessResult> {
     userId: user.id,
   };
 }
+
+/**
+ * 관리자 권한 부여/해제 결과 타입
+ */
+interface AdminRoleResult {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * 특정 사용자에게 관리자 권한 부여
+ *
+ * 현재 사용자가 관리자인 경우에만 실행 가능합니다.
+ *
+ * @param targetEmail - 권한을 부여할 사용자 이메일
+ * @returns 권한 부여 결과
+ *
+ * @example
+ * ```typescript
+ * const result = await grantAdminRole('admin@example.com');
+ * if (result.success) {
+ *   console.log('관리자 권한 부여 성공');
+ * }
+ * ```
+ */
+export async function grantAdminRole(targetEmail: string): Promise<AdminRoleResult> {
+  // 현재 사용자가 관리자인지 확인
+  const authCheck = await verifyAdminAccess();
+  if (!authCheck.authorized) {
+    return {
+      success: false,
+      message: authCheck.message,
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ role: "admin", updated_at: new Date().toISOString() })
+    .eq("email", targetEmail)
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    console.error("[ADMIN] 권한 부여 실패:", error);
+    return {
+      success: false,
+      message: "권한 부여에 실패했습니다. 사용자를 찾을 수 없습니다.",
+    };
+  }
+
+  console.log("[ADMIN] 관리자 권한 부여:", { targetEmail, by: authCheck.userId });
+
+  return {
+    success: true,
+    message: "관리자 권한이 부여되었습니다.",
+  };
+}
+
+/**
+ * 특정 사용자의 관리자 권한 해제
+ *
+ * 현재 사용자가 관리자인 경우에만 실행 가능합니다.
+ * 자기 자신의 권한은 해제할 수 없습니다.
+ *
+ * @param targetEmail - 권한을 해제할 사용자 이메일
+ * @returns 권한 해제 결과
+ *
+ * @example
+ * ```typescript
+ * const result = await revokeAdminRole('user@example.com');
+ * if (result.success) {
+ *   console.log('관리자 권한 해제 성공');
+ * }
+ * ```
+ */
+export async function revokeAdminRole(targetEmail: string): Promise<AdminRoleResult> {
+  // 현재 사용자가 관리자인지 확인
+  const authCheck = await verifyAdminAccess();
+  if (!authCheck.authorized) {
+    return {
+      success: false,
+      message: authCheck.message,
+    };
+  }
+
+  const supabase = await createClient();
+
+  // 대상 사용자 확인
+  const { data: targetProfile, error: fetchError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("email", targetEmail)
+    .single();
+
+  if (fetchError || !targetProfile) {
+    return {
+      success: false,
+      message: "대상 사용자를 찾을 수 없습니다.",
+    };
+  }
+
+  // 자기 자신의 권한 해제 방지
+  if (targetProfile.id === authCheck.userId) {
+    return {
+      success: false,
+      message: "자신의 관리자 권한은 해제할 수 없습니다.",
+    };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role: "user", updated_at: new Date().toISOString() })
+    .eq("email", targetEmail);
+
+  if (error) {
+    console.error("[ADMIN] 권한 해제 실패:", error);
+    return {
+      success: false,
+      message: `권한 해제에 실패했습니다: ${error.message}`,
+    };
+  }
+
+  console.log("[ADMIN] 관리자 권한 해제:", { targetEmail, by: authCheck.userId });
+
+  return {
+    success: true,
+    message: "관리자 권한이 해제되었습니다.",
+  };
+}

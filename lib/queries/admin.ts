@@ -222,7 +222,7 @@ export async function getEventStats(): Promise<EventStats> {
  * ```typescript
  * const result = await getAdminEvents({
  *   searchQuery: '개발',
- *   statusFilter: 'upcoming',
+ *   statusFilter: 'active',
  *   sortBy: 'event_date',
  *   sortOrder: 'asc',
  *   page: 1,

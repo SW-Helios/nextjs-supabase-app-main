@@ -12,6 +12,11 @@
 
 # testing
 /coverage
+/.auth
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
 
 # next.js
 /.next/
@@ -40,3 +45,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright mcp screenshots
+.playwright-mcp/
+
+# shrimp task manager memory
+shrimp_data/memory/
+
+# supabase temp
+supabase/.temp/
+
+# misc
+nul

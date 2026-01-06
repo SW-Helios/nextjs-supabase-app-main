@@ -136,7 +136,7 @@ export interface SortOptions {
  * const params: ListEventsParams = {
  *   page: 1,
  *   limit: 10,
- *   filters: { status: 'upcoming', search: '개발자' },
+ *   filters: { status: 'active', search: '개발자' },
  *   sort: { field: 'event_date', order: 'asc' }
  * }
  * ```

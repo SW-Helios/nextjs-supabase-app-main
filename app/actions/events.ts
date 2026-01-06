@@ -69,10 +69,18 @@ export async function createEventAction(
     const participantIdsRaw = formData.get("participant_ids");
     const participantIds = participantIdsRaw ? JSON.parse(participantIdsRaw as string) : [];
 
+    // 좌표 파싱
+    const latitudeRaw = formData.get("latitude") as string;
+    const longitudeRaw = formData.get("longitude") as string;
+    const latitude = latitudeRaw ? parseFloat(latitudeRaw) : null;
+    const longitude = longitudeRaw ? parseFloat(longitudeRaw) : null;
+
     const validatedFields = eventFormSchema.safeParse({
       title: formData.get("title"),
       description: formData.get("description") || "",
       location: formData.get("location"),
+      latitude: latitude && !isNaN(latitude) ? latitude : null,
+      longitude: longitude && !isNaN(longitude) ? longitude : null,
       event_date: formData.get("event_date"),
       cover_image_url: formData.get("cover_image_url") || "",
       participant_ids: participantIds,
@@ -90,18 +98,23 @@ export async function createEventAction(
     const invite_code = await generateUniqueInviteCode(supabase);
 
     // E. 이벤트 생성 (participant_ids는 events 테이블에 저장하지 않음)
-    const { participant_ids, ...eventData } = validatedFields.data;
+    const { participant_ids, latitude: lat, longitude: lng, ...eventData } = validatedFields.data;
 
     console.log("이벤트 생성 시도:", {
       user_id: user.id,
       invite_code,
       validated_data: eventData,
+      latitude: lat,
+      longitude: lng,
+      participant_ids: participant_ids, // 디버깅: 선택된 참여자 ID 확인
     });
 
     const { data: event, error: insertError } = await supabase
       .from("events")
       .insert({
         ...eventData,
+        latitude: lat,
+        longitude: lng,
         invite_code,
         created_by: user.id,
         status: "active",
@@ -126,11 +139,19 @@ export async function createEventAction(
     // F. 호스트는 DB 트리거(handle_new_event)가 자동으로 추가하므로 별도 처리 불필요
 
     // G. 선택된 고정 참여자들을 event_participants에 추가
+    console.log("참여자 추가 시작:", {
+      participant_ids,
+      event_id: event.id,
+    });
+
     if (participant_ids.length > 0) {
       const fixedParticipants = participant_ids
         .map((id) => {
           const participant = getParticipantById(id);
-          if (!participant) return null;
+          if (!participant) {
+            console.warn("참여자 ID를 찾을 수 없음:", id);
+            return null;
+          }
           return {
             event_id: event.id,
             participant_name: participant.name,
@@ -139,16 +160,28 @@ export async function createEventAction(
         })
         .filter((p): p is NonNullable<typeof p> => p !== null);
 
+      console.log("추가할 참여자 목록:", fixedParticipants);
+
       if (fixedParticipants.length > 0) {
-        const { error: fixedParticipantsError } = await supabase
+        const { data: insertedParticipants, error: fixedParticipantsError } = await supabase
           .from("event_participants")
-          .insert(fixedParticipants);
+          .insert(fixedParticipants)
+          .select();
 
         if (fixedParticipantsError) {
-          console.error("고정 참여자 추가 실패:", fixedParticipantsError);
+          console.error("고정 참여자 추가 실패:", {
+            error: fixedParticipantsError,
+            code: fixedParticipantsError.code,
+            message: fixedParticipantsError.message,
+            details: fixedParticipantsError.details,
+          });
           // 경고만 표시하고 계속 진행
+        } else {
+          console.log("고정 참여자 추가 성공:", insertedParticipants);
         }
       }
+    } else {
+      console.log("선택된 참여자 없음 - 참여자 추가 건너뜀");
     }
 
     // H. 캐시 무효화
@@ -227,10 +260,18 @@ export async function updateEventAction(
     const participantIdsRaw = formData.get("participant_ids");
     const participantIds = participantIdsRaw ? JSON.parse(participantIdsRaw as string) : [];
 
+    // 좌표 파싱
+    const latitudeRaw = formData.get("latitude") as string;
+    const longitudeRaw = formData.get("longitude") as string;
+    const latitude = latitudeRaw ? parseFloat(latitudeRaw) : null;
+    const longitude = longitudeRaw ? parseFloat(longitudeRaw) : null;
+
     const validatedFields = eventFormSchema.safeParse({
       title: formData.get("title"),
       description: formData.get("description") || "",
       location: formData.get("location"),
+      latitude: latitude && !isNaN(latitude) ? latitude : null,
+      longitude: longitude && !isNaN(longitude) ? longitude : null,
       event_date: formData.get("event_date"),
       cover_image_url: formData.get("cover_image_url") || "",
       participant_ids: participantIds,
@@ -272,18 +313,22 @@ export async function updateEventAction(
     }
 
     // F. 이벤트 업데이트 (participant_ids는 events 테이블에 저장하지 않음)
-    const { participant_ids, ...eventData } = validatedFields.data;
+    const { participant_ids, latitude: lat, longitude: lng, ...eventData } = validatedFields.data;
 
     console.log("이벤트 수정 시도:", {
       eventId,
       userId: user.id,
       validatedData: eventData,
+      latitude: lat,
+      longitude: lng,
     });
 
     const { data: updatedEvent, error: updateError } = await supabase
       .from("events")
       .update({
         ...eventData,
+        latitude: lat,
+        longitude: lng,
         updated_at: new Date().toISOString(),
       })
       .eq("id", eventId)
@@ -304,16 +349,28 @@ export async function updateEventAction(
 
     // G. 참여자 업데이트 (기존 고정 참여자 삭제 후 새 참여자 추가)
     // 호스트와 실제 사용자(user_id가 있는) 참여자는 유지
-    const { error: deleteParticipantsError } = await supabase
+    console.log("참여자 업데이트 시작:", {
+      eventId,
+      participant_ids,
+    });
+
+    const { data: deletedParticipants, error: deleteParticipantsError } = await supabase
       .from("event_participants")
       .delete()
       .eq("event_id", eventId)
       .is("user_id", null) // user_id가 null인 고정 참여자만 삭제
-      .neq("role", "host"); // 호스트는 삭제하지 않음
+      .neq("role", "host") // 호스트는 삭제하지 않음
+      .select();
 
     if (deleteParticipantsError) {
-      console.error("기존 참여자 삭제 실패:", deleteParticipantsError);
+      console.error("기존 참여자 삭제 실패:", {
+        error: deleteParticipantsError,
+        code: deleteParticipantsError.code,
+        message: deleteParticipantsError.message,
+      });
       // 계속 진행
+    } else {
+      console.log("기존 고정 참여자 삭제 완료:", deletedParticipants);
     }
 
     // 새 고정 참여자 추가
@@ -321,7 +378,10 @@ export async function updateEventAction(
       const fixedParticipants = participant_ids
         .map((id) => {
           const participant = getParticipantById(id);
-          if (!participant) return null;
+          if (!participant) {
+            console.warn("참여자 ID를 찾을 수 없음:", id);
+            return null;
+          }
           return {
             event_id: eventId,
             participant_name: participant.name,
@@ -330,16 +390,28 @@ export async function updateEventAction(
         })
         .filter((p): p is NonNullable<typeof p> => p !== null);
 
+      console.log("추가할 새 참여자 목록:", fixedParticipants);
+
       if (fixedParticipants.length > 0) {
-        const { error: insertParticipantsError } = await supabase
+        const { data: insertedParticipants, error: insertParticipantsError } = await supabase
           .from("event_participants")
-          .insert(fixedParticipants);
+          .insert(fixedParticipants)
+          .select();
 
         if (insertParticipantsError) {
-          console.error("새 참여자 추가 실패:", insertParticipantsError);
+          console.error("새 참여자 추가 실패:", {
+            error: insertParticipantsError,
+            code: insertParticipantsError.code,
+            message: insertParticipantsError.message,
+            details: insertParticipantsError.details,
+          });
           // 경고만 표시하고 계속 진행
+        } else {
+          console.log("새 참여자 추가 성공:", insertedParticipants);
         }
       }
+    } else {
+      console.log("선택된 참여자 없음 - 새 참여자 추가 건너뜀");
     }
 
     // H. 캐시 무효화

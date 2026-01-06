@@ -132,3 +132,123 @@ export async function uploadCoverImageAction(
     };
   }
 }
+
+/**
+ * 댓글 이미지 업로드 Server Action
+ *
+ * Supabase Storage의 'comment-images' 버킷에 이미지를 업로드합니다.
+ * - 인증된 사용자만 업로드 가능
+ * - 파일 크기: 최대 3MB
+ * - 허용된 파일 타입: JPEG, PNG, WebP
+ * - 파일 경로: {user_id}/{timestamp}_{원본파일명}
+ *
+ * @param formData - 업로드할 파일을 포함한 FormData ('file' 필드)
+ * @returns 업로드된 이미지의 공개 URL 또는 에러 메시지
+ *
+ * @example
+ * ```typescript
+ * const formData = new FormData();
+ * formData.append('file', imageFile);
+ * const result = await uploadCommentImageAction(formData);
+ *
+ * if (result.success) {
+ *   console.log('업로드된 이미지 URL:', result.data?.url);
+ * }
+ * ```
+ */
+export async function uploadCommentImageAction(
+  formData: FormData
+): Promise<ActionResult<{ url: string }>> {
+  try {
+    // 1. Supabase 클라이언트 생성
+    const supabase = await createClient();
+
+    // 2. 사용자 인증 확인
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        message: "로그인이 필요합니다.",
+      };
+    }
+
+    // 3. FormData에서 파일 추출
+    const file = formData.get("file") as File | null;
+
+    if (!file) {
+      return {
+        success: false,
+        message: "업로드할 파일을 선택해주세요.",
+      };
+    }
+
+    // 4. 파일 크기 검증 (3MB)
+    const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+    if (file.size > MAX_FILE_SIZE) {
+      return {
+        success: false,
+        message: "파일 크기가 너무 큽니다. 3MB 이하의 파일을 업로드해주세요.",
+      };
+    }
+
+    // 5. 파일 타입 검증 (JPEG, PNG, WebP, HEIF, BMP 허용)
+    const ALLOWED_MIME_TYPES = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/heif",
+      "image/heic",
+      "image/bmp",
+    ];
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return {
+        success: false,
+        message: "JPEG, PNG, WebP, HEIF, BMP 형식의 이미지만 업로드 가능합니다.",
+      };
+    }
+
+    // 6. 파일 경로 생성 (user_id 폴더 하위에 저장)
+    const timestamp = Date.now();
+    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filePath = `${user.id}/${timestamp}_${sanitizedFileName}`;
+
+    // 7. Supabase Storage에 업로드
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("comment-images")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("[uploadCommentImageAction] 업로드 실패:", uploadError);
+      return {
+        success: false,
+        message: "이미지 업로드 중 오류가 발생했습니다.",
+      };
+    }
+
+    // 8. Public URL 생성 및 반환
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("comment-images").getPublicUrl(uploadData.path);
+
+    return {
+      success: true,
+      message: "이미지가 업로드되었습니다.",
+      data: {
+        url: publicUrl,
+      },
+    };
+  } catch (error) {
+    console.error("[uploadCommentImageAction] 예외 발생:", error);
+    return {
+      success: false,
+      message: "예상치 못한 오류가 발생했습니다.",
+    };
+  }
+}

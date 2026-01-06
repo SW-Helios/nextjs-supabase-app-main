@@ -13,13 +13,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { eventFormSchema, type EventFormData } from "@/lib/schemas/event";
 import { showSuccess, showError } from "@/lib/utils/toast";
 import { createEventAction } from "@/app/actions/events";
 import { CoverImageUpload } from "@/components/events/cover-image-upload";
+import { LocationPicker } from "@/components/maps/location-picker";
+import { FIXED_PARTICIPANTS } from "@/lib/constants/participants";
+import type { LocationData } from "@/lib/types/maps";
 
 /**
  * 이벤트 생성 폼 (Client Component)
@@ -36,10 +41,20 @@ export function EventForm() {
       title: "",
       description: "",
       location: "",
+      latitude: null,
+      longitude: null,
       event_date: "",
       cover_image_url: "",
+      participant_ids: [],
     },
   });
+
+  // 장소 선택 핸들러
+  const handleLocationChange = (location: LocationData) => {
+    form.setValue("location", location.address);
+    form.setValue("latitude", location.latitude);
+    form.setValue("longitude", location.longitude);
+  };
 
   // 폼 제출 핸들러
   const onSubmit = async (data: EventFormData) => {
@@ -49,8 +64,11 @@ export function EventForm() {
       formData.append("title", data.title);
       formData.append("description", data.description || "");
       formData.append("location", data.location);
+      formData.append("latitude", data.latitude?.toString() || "");
+      formData.append("longitude", data.longitude?.toString() || "");
       formData.append("event_date", data.event_date);
       formData.append("cover_image_url", data.cover_image_url || "");
+      formData.append("participant_ids", JSON.stringify(data.participant_ids));
 
       // Server Action 호출
       const result = await createEventAction({ success: false, message: "" }, formData);
@@ -135,15 +153,73 @@ export function EventForm() {
             )}
           />
 
-          {/* 장소 */}
+          {/* 참여자 선택 */}
+          <FormField
+            control={form.control}
+            name="participant_ids"
+            render={() => (
+              <FormItem>
+                <div className="mb-4">
+                  <FormLabel>참여자 선택 *</FormLabel>
+                  <FormDescription>이벤트에 참여할 사람을 선택하세요 (최소 1명)</FormDescription>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {FIXED_PARTICIPANTS.map((participant) => (
+                    <FormField
+                      key={participant.id}
+                      control={form.control}
+                      name="participant_ids"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={participant.id}
+                            className="flex flex-row items-start space-y-0 space-x-3"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(participant.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...field.value, participant.id])
+                                    : field.onChange(
+                                        field.value?.filter((value) => value !== participant.id)
+                                      );
+                                }}
+                                disabled={isSubmitting}
+                              />
+                            </FormControl>
+                            <FormLabel className="cursor-pointer font-normal">
+                              {participant.name}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* 장소 (네이버 지도 연동) */}
           <FormField
             control={form.control}
             name="location"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>장소 *</FormLabel>
                 <FormControl>
-                  <Input placeholder="예: 강남역 스타벅스" {...field} disabled={isSubmitting} />
+                  <LocationPicker
+                    initialValue={{
+                      address: form.getValues("location"),
+                      latitude: form.getValues("latitude") ?? null,
+                      longitude: form.getValues("longitude") ?? null,
+                    }}
+                    onChange={handleLocationChange}
+                    disabled={isSubmitting}
+                    mapHeight="h-40"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

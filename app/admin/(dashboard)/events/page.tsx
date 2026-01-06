@@ -35,7 +35,9 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState<EventTableRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "upcoming" | "ongoing" | "ended">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "cancelled" | "completed">(
+    "all"
+  );
 
   /**
    * 이벤트 목록 조회
@@ -103,12 +105,12 @@ export default function AdminEventsPage() {
    */
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "upcoming":
-        return <Badge variant="default">예정</Badge>;
-      case "ongoing":
-        return <Badge variant="secondary">진행 중</Badge>;
-      case "ended":
+      case "active":
+        return <Badge variant="default">진행 중</Badge>;
+      case "completed":
         return <Badge variant="outline">종료</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">취소됨</Badge>;
       default:
         return null;
     }
@@ -143,7 +145,7 @@ export default function AdminEventsPage() {
           <Select
             value={statusFilter}
             onValueChange={(value) =>
-              setStatusFilter(value as "all" | "upcoming" | "ongoing" | "ended")
+              setStatusFilter(value as "all" | "active" | "cancelled" | "completed")
             }
           >
             <SelectTrigger className="w-full md:w-[180px]">
@@ -151,9 +153,9 @@ export default function AdminEventsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="upcoming">예정</SelectItem>
-              <SelectItem value="ongoing">진행 중</SelectItem>
-              <SelectItem value="ended">종료</SelectItem>
+              <SelectItem value="active">진행 중</SelectItem>
+              <SelectItem value="completed">종료</SelectItem>
+              <SelectItem value="cancelled">취소됨</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>

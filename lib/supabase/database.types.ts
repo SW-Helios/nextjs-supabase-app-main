@@ -8,27 +8,75 @@ export type Database = {
   };
   public: {
     Tables: {
+      event_comments: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          content: string;
+          image_urls: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          user_id: string;
+          content: string;
+          image_urls?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          user_id?: string;
+          content?: string;
+          image_urls?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "event_comments_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "event_comments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       event_participants: {
         Row: {
           event_id: string;
           id: string;
           joined_at: string;
           role: string;
-          user_id: string;
+          user_id: string | null;
+          participant_name: string | null;
         };
         Insert: {
           event_id: string;
           id?: string;
           joined_at?: string;
           role: string;
-          user_id: string;
+          user_id?: string | null;
+          participant_name?: string | null;
         };
         Update: {
           event_id?: string;
           id?: string;
           joined_at?: string;
           role?: string;
-          user_id?: string;
+          user_id?: string | null;
+          participant_name?: string | null;
         };
         Relationships: [
           {
@@ -56,7 +104,10 @@ export type Database = {
           event_date: string;
           id: string;
           invite_code: string;
+          latitude: number | null;
           location: string;
+          longitude: number | null;
+          max_participants: number;
           status: string;
           title: string;
           updated_at: string;
@@ -69,7 +120,10 @@ export type Database = {
           event_date: string;
           id?: string;
           invite_code: string;
+          latitude?: number | null;
           location: string;
+          longitude?: number | null;
+          max_participants?: number;
           status?: string;
           title: string;
           updated_at?: string;
@@ -82,7 +136,10 @@ export type Database = {
           event_date?: string;
           id?: string;
           invite_code?: string;
+          latitude?: number | null;
           location?: string;
+          longitude?: number | null;
+          max_participants?: number;
           status?: string;
           title?: string;
           updated_at?: string;
@@ -138,7 +195,12 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      generate_invite_code: {
+        Args: {
+          length?: number;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;

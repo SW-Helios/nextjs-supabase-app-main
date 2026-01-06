@@ -15,6 +15,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-001",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -22,6 +23,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -29,6 +31,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -36,6 +39,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -43,6 +47,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -50,6 +55,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -57,6 +63,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -64,6 +71,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-001",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -73,6 +81,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-002",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -80,6 +89,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -87,6 +97,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -94,6 +105,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -101,6 +113,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -108,6 +121,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -115,6 +129,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -122,6 +137,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -129,6 +145,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-004",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -136,6 +153,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-002",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -145,6 +163,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-003",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -152,6 +171,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -159,6 +179,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -166,6 +187,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -173,6 +195,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -180,6 +203,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-003",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -189,6 +213,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-004",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -196,6 +221,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -203,6 +229,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -210,6 +237,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -217,6 +245,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -224,6 +253,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -231,6 +261,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -238,6 +269,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -245,6 +277,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -252,6 +285,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-004",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -261,6 +295,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-005",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -268,6 +303,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -275,6 +311,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -282,6 +319,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -289,6 +327,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-004",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -296,6 +335,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -303,6 +343,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-005",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -315,6 +356,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-006",
     user_id: "user-001",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -322,6 +364,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-006",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -329,6 +372,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-006",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -336,6 +380,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-006",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -343,6 +388,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-006",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -352,6 +398,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-002",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -359,6 +406,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -366,6 +414,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -373,6 +422,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-004",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -380,6 +430,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -387,6 +438,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -394,6 +446,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -401,6 +454,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -408,6 +462,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -415,6 +470,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-007",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -425,6 +481,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-008",
     user_id: "user-003",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -432,6 +489,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-008",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -439,6 +497,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-008",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -446,6 +505,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-008",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -455,6 +515,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-004",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -462,6 +523,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -469,6 +531,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -476,6 +539,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -483,6 +547,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -490,6 +555,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -497,6 +563,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -504,6 +571,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-009",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -513,6 +581,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-010",
     user_id: "user-005",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -520,6 +589,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-010",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -527,6 +597,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-010",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -534,6 +605,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-010",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -541,6 +613,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-010",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -551,6 +624,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-001",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -558,6 +632,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -565,6 +640,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -572,6 +648,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 24 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -579,6 +656,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -586,6 +664,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-011",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -596,6 +675,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-002",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -603,6 +683,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 38 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -610,6 +691,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 36 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -617,6 +699,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-004",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 34 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -624,6 +707,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 32 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -631,6 +715,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -638,6 +723,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -645,6 +731,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -652,6 +739,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-012",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 24 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -661,6 +749,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-013",
     user_id: "user-003",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -668,6 +757,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-013",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -675,6 +765,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-013",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -683,6 +774,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-014",
     user_id: "user-004",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -690,6 +782,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-014",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -697,6 +790,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-014",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -705,6 +799,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-015",
     user_id: "user-005",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -712,6 +807,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-015",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 24 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -719,6 +815,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-015",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -726,6 +823,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-015",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -735,6 +833,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-016",
     user_id: "user-001",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -742,6 +841,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-016",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -749,6 +849,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-016",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -757,6 +858,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-017",
     user_id: "user-002",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -764,6 +866,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-017",
     user_id: "user-003",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -771,6 +874,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-017",
     user_id: "user-008",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -779,6 +883,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-018",
     user_id: "user-003",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -786,6 +891,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-018",
     user_id: "user-004",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 38 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -793,6 +899,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-018",
     user_id: "user-005",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -800,6 +907,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-018",
     user_id: "user-009",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -808,6 +916,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-019",
     user_id: "user-004",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 49 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -815,6 +924,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-019",
     user_id: "user-001",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -822,6 +932,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-019",
     user_id: "user-002",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
   },
 
@@ -830,6 +941,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-020",
     user_id: "user-005",
     role: "host",
+    participant_name: null,
     joined_at: new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -837,6 +949,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-020",
     user_id: "user-006",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -844,6 +957,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-020",
     user_id: "user-007",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -851,6 +965,7 @@ export const dummyParticipants: EventParticipant[] = [
     event_id: "event-020",
     user_id: "user-010",
     role: "participant",
+    participant_name: null,
     joined_at: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];

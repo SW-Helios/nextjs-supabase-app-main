@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "zvonmodzgtybupsknpri.supabase.co",
+      },
+      {
+        protocol: "https",
         hostname: "cdn.pixabay.com",
       },
     ],

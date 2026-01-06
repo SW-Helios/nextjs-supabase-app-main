@@ -2,42 +2,30 @@
   "mcpServers": {
     "supabase": {
       "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=zvonmodzgtybupsknpri&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment"
+      "url": "https://mcp.supabase.com/mcp?project_ref=zvonmodzgtybupsknpri"
     },
     "playwright": {
       "type": "stdio",
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "@playwright/mcp@latest"
-      ],
+      "args": ["/c", "npx", "@playwright/mcp@latest"],
       "env": {}
     },
     "context7": {
       "type": "stdio",
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@upstash/context7-mcp@latest"]
+      "command": "node",
+      "args": [
+        "C:/Users/ehdus/AppData/Roaming/npm/node_modules/@upstash/context7-mcp/dist/index.js"
+      ]
     },
     "sequential-thinking": {
       "type": "stdio",
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
     "shadcn": {
       "type": "stdio",
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "shadcn@latest",
-        "mcp"
-      ]
+      "args": ["/c", "npx", "shadcn@latest", "mcp"]
     },
     "shrimp-task-manager": {
       "type": "stdio",

@@ -34,11 +34,12 @@ export async function getEventWithHost(eventId: string): Promise<EventWithHost |
       return null;
     }
 
-    // 참여자 수 조회
+    // 참여자 수 조회 (호스트 제외)
     const { count, error: countError } = await supabase
       .from("event_participants")
       .select("*", { count: "exact", head: true })
-      .eq("event_id", eventId);
+      .eq("event_id", eventId)
+      .neq("role", "host");
 
     if (countError) {
       // 참여자 수 조회 실패 시 0으로 처리
@@ -87,13 +88,14 @@ export async function getUserHostedEvents(userId: string): Promise<EventWithHost
       return [];
     }
 
-    // 각 이벤트의 참여자 수 조회
+    // 각 이벤트의 참여자 수 조회 (호스트 제외)
     const eventsWithCount = await Promise.all(
       events.map(async (event) => {
         const { count, error: countError } = await supabase
           .from("event_participants")
           .select("*", { count: "exact", head: true })
-          .eq("event_id", event.id);
+          .eq("event_id", event.id)
+          .neq("role", "host");
 
         if (countError) {
           // 참여자 수 조회 실패 시 0으로 처리
@@ -164,13 +166,14 @@ export async function getUserParticipatingEvents(userId: string): Promise<EventW
       return [];
     }
 
-    // 각 이벤트의 참여자 수 조회
+    // 각 이벤트의 참여자 수 조회 (호스트 제외)
     const eventsWithCount = await Promise.all(
       events.map(async (event) => {
         const { count, error: countError } = await supabase
           .from("event_participants")
           .select("*", { count: "exact", head: true })
-          .eq("event_id", event.id);
+          .eq("event_id", event.id)
+          .neq("role", "host");
 
         if (countError) {
           // 참여자 수 조회 실패 시 0으로 처리
@@ -323,13 +326,14 @@ export async function getActiveEvents(limit: number = 20): Promise<EventWithHost
       return [];
     }
 
-    // 각 이벤트의 참여자 수 조회
+    // 각 이벤트의 참여자 수 조회 (호스트 제외)
     const eventsWithCount = await Promise.all(
       events.map(async (event) => {
         const { count, error: countError } = await supabase
           .from("event_participants")
           .select("*", { count: "exact", head: true })
-          .eq("event_id", event.id);
+          .eq("event_id", event.id)
+          .neq("role", "host");
 
         if (countError) {
           // 참여자 수 조회 실패 시 0으로 처리
@@ -381,11 +385,12 @@ export async function getEventByInviteCode(
       return null;
     }
 
-    // 참여자 수 조회
+    // 참여자 수 조회 (호스트 제외)
     const { count, error: countError } = await supabase
       .from("event_participants")
       .select("*", { count: "exact", head: true })
-      .eq("event_id", event.id);
+      .eq("event_id", event.id)
+      .neq("role", "host");
 
     if (countError) {
       // 참여자 수 조회 실패 시 0으로 처리
