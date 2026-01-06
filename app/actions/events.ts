@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { eventFormSchema } from "@/lib/schemas/event";
 import { generateUniqueInviteCode } from "@/lib/utils/invite-code";
+import { getParticipantById } from "@/lib/constants/participants";
 import type { ActionResult } from "@/lib/types/forms";
 
 /**
@@ -65,12 +66,16 @@ export async function createEventAction(
     }
 
     // C. 서버 사이드 스키마 검증 (이중 검증)
+    const participantIdsRaw = formData.get("participant_ids");
+    const participantIds = participantIdsRaw ? JSON.parse(participantIdsRaw as string) : [];
+
     const validatedFields = eventFormSchema.safeParse({
       title: formData.get("title"),
       description: formData.get("description") || "",
       location: formData.get("location"),
       event_date: formData.get("event_date"),
       cover_image_url: formData.get("cover_image_url") || "",
+      participant_ids: participantIds,
     });
 
     if (!validatedFields.success) {
@@ -84,20 +89,22 @@ export async function createEventAction(
     // D. 초대 코드 생성 (중복 체크 포함)
     const invite_code = await generateUniqueInviteCode(supabase);
 
-    // E. 이벤트 생성
+    // E. 이벤트 생성 (participant_ids는 events 테이블에 저장하지 않음)
+    const { participant_ids, ...eventData } = validatedFields.data;
+
     console.log("이벤트 생성 시도:", {
       user_id: user.id,
       invite_code,
-      validated_data: validatedFields.data,
+      validated_data: eventData,
     });
 
     const { data: event, error: insertError } = await supabase
       .from("events")
       .insert({
-        ...validatedFields.data,
+        ...eventData,
         invite_code,
         created_by: user.id,
-        status: "upcoming",
+        status: "active",
       })
       .select()
       .single();
@@ -116,28 +123,35 @@ export async function createEventAction(
       };
     }
 
-    // F. 주최자를 참여자로 자동 추가 (role: 'host')
-    const { error: participantError } = await supabase.from("event_participants").insert({
-      event_id: event.id,
-      user_id: user.id,
-      role: "host",
-    });
+    // F. 호스트는 DB 트리거(handle_new_event)가 자동으로 추가하므로 별도 처리 불필요
 
-    if (participantError) {
-      console.error("주최자 참여자 추가 실패:", participantError);
-      // 이벤트는 생성되었지만 참여자 추가 실패
-      // 이 경우에도 성공으로 처리하되 경고 메시지 추가
-      return {
-        success: true,
-        message: "이벤트가 생성되었지만 참여자 정보 추가에 문제가 발생했습니다.",
-        data: {
-          id: event.id,
-          invite_code: event.invite_code,
-        },
-      };
+    // G. 선택된 고정 참여자들을 event_participants에 추가
+    if (participant_ids.length > 0) {
+      const fixedParticipants = participant_ids
+        .map((id) => {
+          const participant = getParticipantById(id);
+          if (!participant) return null;
+          return {
+            event_id: event.id,
+            participant_name: participant.name,
+            role: "participant",
+          };
+        })
+        .filter((p): p is NonNullable<typeof p> => p !== null);
+
+      if (fixedParticipants.length > 0) {
+        const { error: fixedParticipantsError } = await supabase
+          .from("event_participants")
+          .insert(fixedParticipants);
+
+        if (fixedParticipantsError) {
+          console.error("고정 참여자 추가 실패:", fixedParticipantsError);
+          // 경고만 표시하고 계속 진행
+        }
+      }
     }
 
-    // G. 캐시 무효화
+    // H. 캐시 무효화
     revalidatePath("/events");
 
     return {
@@ -210,12 +224,16 @@ export async function updateEventAction(
     }
 
     // C. 서버 사이드 스키마 검증
+    const participantIdsRaw = formData.get("participant_ids");
+    const participantIds = participantIdsRaw ? JSON.parse(participantIdsRaw as string) : [];
+
     const validatedFields = eventFormSchema.safeParse({
       title: formData.get("title"),
       description: formData.get("description") || "",
       location: formData.get("location"),
       event_date: formData.get("event_date"),
       cover_image_url: formData.get("cover_image_url") || "",
+      participant_ids: participantIds,
     });
 
     if (!validatedFields.success) {
@@ -253,17 +271,19 @@ export async function updateEventAction(
       };
     }
 
-    // F. 이벤트 업데이트
+    // F. 이벤트 업데이트 (participant_ids는 events 테이블에 저장하지 않음)
+    const { participant_ids, ...eventData } = validatedFields.data;
+
     console.log("이벤트 수정 시도:", {
       eventId,
       userId: user.id,
-      validatedData: validatedFields.data,
+      validatedData: eventData,
     });
 
     const { data: updatedEvent, error: updateError } = await supabase
       .from("events")
       .update({
-        ...validatedFields.data,
+        ...eventData,
         updated_at: new Date().toISOString(),
       })
       .eq("id", eventId)
@@ -282,7 +302,47 @@ export async function updateEventAction(
       };
     }
 
-    // G. 캐시 무효화
+    // G. 참여자 업데이트 (기존 고정 참여자 삭제 후 새 참여자 추가)
+    // 호스트와 실제 사용자(user_id가 있는) 참여자는 유지
+    const { error: deleteParticipantsError } = await supabase
+      .from("event_participants")
+      .delete()
+      .eq("event_id", eventId)
+      .is("user_id", null) // user_id가 null인 고정 참여자만 삭제
+      .neq("role", "host"); // 호스트는 삭제하지 않음
+
+    if (deleteParticipantsError) {
+      console.error("기존 참여자 삭제 실패:", deleteParticipantsError);
+      // 계속 진행
+    }
+
+    // 새 고정 참여자 추가
+    if (participant_ids.length > 0) {
+      const fixedParticipants = participant_ids
+        .map((id) => {
+          const participant = getParticipantById(id);
+          if (!participant) return null;
+          return {
+            event_id: eventId,
+            participant_name: participant.name,
+            role: "participant",
+          };
+        })
+        .filter((p): p is NonNullable<typeof p> => p !== null);
+
+      if (fixedParticipants.length > 0) {
+        const { error: insertParticipantsError } = await supabase
+          .from("event_participants")
+          .insert(fixedParticipants);
+
+        if (insertParticipantsError) {
+          console.error("새 참여자 추가 실패:", insertParticipantsError);
+          // 경고만 표시하고 계속 진행
+        }
+      }
+    }
+
+    // H. 캐시 무효화
     revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
 

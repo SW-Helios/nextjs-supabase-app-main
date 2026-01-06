@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EventEditForm } from "@/components/events/event-edit-form";
-import { getEventWithHost, isUserHost } from "@/lib/queries/events";
+import { getEventDetail, isUserHost } from "@/lib/queries/events";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -27,11 +27,11 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     redirect("/auth/login");
   }
 
-  // 이벤트 데이터 조회
-  const eventWithHost = await getEventWithHost(id);
+  // 이벤트 데이터 조회 (참여자 목록 포함)
+  const eventDetail = await getEventDetail(id);
 
   // 이벤트가 없으면 404 페이지로 처리
-  if (!eventWithHost) {
+  if (!eventDetail) {
     notFound();
   }
 
@@ -59,7 +59,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       </div>
 
       {/* 수정 폼 */}
-      <EventEditForm event={eventWithHost} />
+      <EventEditForm event={eventDetail} />
     </div>
   );
 }

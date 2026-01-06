@@ -11,18 +11,36 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { eventFormSchema, type EventFormData } from "@/lib/schemas/event";
 import { showSuccess, showError } from "@/lib/utils/toast";
 import { updateEventAction } from "@/app/actions/events";
 import { Loader2 } from "lucide-react";
-import type { Event } from "@/lib/types/models";
 import { CoverImageUpload } from "@/components/events/cover-image-upload";
+import { FIXED_PARTICIPANTS } from "@/lib/constants/participants";
+
+// 이벤트 상세 정보 타입 (참여자 목록 포함)
+interface EventDetailWithParticipants {
+  id: string;
+  title: string;
+  description: string | null;
+  location: string;
+  event_date: string;
+  cover_image_url: string | null;
+  participants: Array<{
+    id: string;
+    role: string;
+    participant_name: string | null;
+    user_id: string | null;
+  }>;
+}
 
 interface EventEditFormProps {
-  event: Event;
+  event: EventDetailWithParticipants;
 }
 
 /**
@@ -32,6 +50,16 @@ interface EventEditFormProps {
  */
 export function EventEditForm({ event }: EventEditFormProps) {
   const router = useRouter();
+
+  // 기존 참여자들의 participant_name을 기반으로 FIXED_PARTICIPANTS ID 찾기
+  const existingParticipantIds = event.participants
+    .filter((p) => p.role !== "host") // 호스트 제외
+    .map((p) => {
+      // participant_name으로 FIXED_PARTICIPANTS에서 ID 찾기
+      const found = FIXED_PARTICIPANTS.find((fp) => fp.name === p.participant_name);
+      return found?.id;
+    })
+    .filter((id): id is string => id !== undefined);
 
   // React Hook Form 초기화
   const form = useForm<EventFormData>({
@@ -43,6 +71,7 @@ export function EventEditForm({ event }: EventEditFormProps) {
       // ISO 문자열을 datetime-local 형식으로 변환
       event_date: new Date(event.event_date).toISOString().slice(0, 16),
       cover_image_url: event.cover_image_url || "",
+      participant_ids: existingParticipantIds,
     },
   });
 
@@ -56,6 +85,7 @@ export function EventEditForm({ event }: EventEditFormProps) {
       formData.append("location", data.location);
       formData.append("event_date", data.event_date);
       formData.append("cover_image_url", data.cover_image_url || "");
+      formData.append("participant_ids", JSON.stringify(data.participant_ids));
 
       // Server Action 호출
       const result = await updateEventAction(event.id, { success: false, message: "" }, formData);
@@ -119,6 +149,57 @@ export function EventEditForm({ event }: EventEditFormProps) {
                   disabled={isSubmitting}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* 참여자 선택 */}
+        <FormField
+          control={form.control}
+          name="participant_ids"
+          render={() => (
+            <FormItem>
+              <div className="mb-4">
+                <FormLabel>참여자 선택 *</FormLabel>
+                <FormDescription>
+                  이벤트에 참여할 사람을 선택하세요 (최소 1명)
+                </FormDescription>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {FIXED_PARTICIPANTS.map((participant) => (
+                  <FormField
+                    key={participant.id}
+                    control={form.control}
+                    name="participant_ids"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={participant.id}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(participant.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([...field.value, participant.id])
+                                  : field.onChange(
+                                      field.value?.filter((value) => value !== participant.id)
+                                    );
+                              }}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer">
+                            {participant.name}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+              </div>
               <FormMessage />
             </FormItem>
           )}
