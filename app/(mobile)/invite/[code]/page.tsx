@@ -37,30 +37,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nextjs-supabase-app-main.vercel.app";
 
+  // 동적 OG 이미지 API URL (항상 생성됨)
+  const ogImageUrl = `${baseUrl}/api/og/invite/${code}`;
+
   return {
     title: `${event.title} - 이벤트 초대`,
-    description: event.description || `${event.host.username}님이 초대했습니다. ${event.location}에서 만나요!`,
+    description:
+      event.description || `${event.host.username}님이 초대했습니다. ${event.location}에서 만나요!`,
     openGraph: {
       title: event.title,
       description: event.description || `${event.host.username}님이 초대했습니다`,
       type: "website",
       url: `${baseUrl}/invite/${code}`,
-      images: event.cover_image_url
-        ? [
-            {
-              url: event.cover_image_url,
-              width: 1200,
-              height: 630,
-              alt: event.title,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: event.title,
       description: event.description || `${event.host.username}님이 초대했습니다`,
-      images: event.cover_image_url ? [event.cover_image_url] : undefined,
+      images: [ogImageUrl],
     },
   };
 }
@@ -184,7 +186,10 @@ export default async function InvitePage({ params }: PageProps) {
                 </Button>
                 <p className="text-muted-foreground text-center text-sm">
                   참여하려면{" "}
-                  <Link href={`/auth/login?redirect=/invite/${code}`} className="text-primary underline">
+                  <Link
+                    href={`/auth/login?redirect=/invite/${code}`}
+                    className="text-primary underline"
+                  >
                     로그인
                   </Link>
                   이 필요합니다
