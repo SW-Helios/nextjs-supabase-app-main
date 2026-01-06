@@ -218,7 +218,7 @@ export async function getEventDetail(eventId: string) {
       return null;
     }
 
-    // 참여자 목록 조회 (사용자 정보 포함)
+    // 참여자 목록 조회 (사용자 정보 및 고정 참여자 포함, 호스트 제외)
     const { data: participants, error: participantsError } = await supabase
       .from("event_participants")
       .select(
@@ -226,22 +226,27 @@ export async function getEventDetail(eventId: string) {
         id,
         role,
         joined_at,
+        user_id,
+        participant_name,
         user:profiles!event_participants_user_id_fkey(id, username, avatar_url)
       `
       )
       .eq("event_id", eventId)
+      .neq("role", "host") // 호스트는 참여자 목록에서 제외
       .order("joined_at", { ascending: true });
 
     if (participantsError) {
       // 참여자 조회 실패 시 빈 배열로 처리
     }
 
-    // 타입 변환
+    // 타입 변환 (실제 사용자와 고정 참여자 모두 처리)
     const participantsList = (participants || []).map((p) => ({
       id: p.id,
       role: p.role,
       joined_at: p.joined_at,
-      user: Array.isArray(p.user) ? p.user[0] : p.user,
+      user_id: p.user_id,
+      participant_name: p.participant_name,
+      user: p.user_id && p.user ? (Array.isArray(p.user) ? p.user[0] : p.user) : null,
     }));
 
     return {
@@ -283,6 +288,65 @@ export async function isUserHost(userId: string, eventId: string): Promise<boole
   } catch {
     // isUserHost 예외 발생 시 false 반환
     return false;
+  }
+}
+
+/**
+ * 모든 진행중인 이벤트 조회 (호스트 정보 및 참여자 수 포함)
+ *
+ * @param limit - 최대 조회 개수 (기본값: 20)
+ * @returns Promise<EventWithHost[]> - 이벤트 목록
+ */
+export async function getActiveEvents(limit: number = 20): Promise<EventWithHost[]> {
+  try {
+    const supabase = await createClient();
+
+    // 모든 active 상태의 이벤트 조회 (최신순)
+    const { data: events, error } = await supabase
+      .from("events")
+      .select(
+        `
+        *,
+        host:profiles!events_created_by_fkey(id, username, avatar_url)
+      `
+      )
+      .eq("status", "active")
+      .order("event_date", { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      console.error("[getActiveEvents] 진행중인 이벤트 조회 실패:", error);
+      return [];
+    }
+
+    if (!events || events.length === 0) {
+      return [];
+    }
+
+    // 각 이벤트의 참여자 수 조회
+    const eventsWithCount = await Promise.all(
+      events.map(async (event) => {
+        const { count, error: countError } = await supabase
+          .from("event_participants")
+          .select("*", { count: "exact", head: true })
+          .eq("event_id", event.id);
+
+        if (countError) {
+          // 참여자 수 조회 실패 시 0으로 처리
+        }
+
+        return {
+          ...event,
+          host: Array.isArray(event.host) ? event.host[0] : event.host,
+          participant_count: count ?? 0,
+        } as EventWithHost;
+      })
+    );
+
+    return eventsWithCount;
+  } catch {
+    console.error("[getActiveEvents] 예외 발생");
+    return [];
   }
 }
 

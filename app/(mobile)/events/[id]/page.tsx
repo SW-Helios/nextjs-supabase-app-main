@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { Calendar, MapPin, Users, Edit } from "lucide-react";
+import { Calendar, MapPin, Users, Edit, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,12 +46,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   // 상태별 배지
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "upcoming":
-        return <Badge variant="default">예정</Badge>;
-      case "ongoing":
-        return <Badge variant="secondary">진행 중</Badge>;
-      case "ended":
+      case "active":
+        return <Badge variant="default">진행 중</Badge>;
+      case "completed":
         return <Badge variant="outline">종료</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">취소됨</Badge>;
       default:
         return null;
     }
@@ -151,16 +151,30 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               {event.participants.map((participant: ParticipantWithUser) => (
                 <div key={participant.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage
-                        src={participant.user.avatar_url ?? undefined}
-                        alt={participant.user.username ?? ""}
-                      />
-                      <AvatarFallback>{getInitials(participant.user.username)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{participant.user.username}</p>
-                    </div>
+                    {/* 고정 참여자인 경우 User 아이콘 + 풀네임, 실제 사용자인 경우 Avatar + 이름 */}
+                    {participant.participant_name ? (
+                      <>
+                        <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+                          <User className="text-muted-foreground h-5 w-5" />
+                        </div>
+                        <p className="font-medium">{participant.participant_name}</p>
+                      </>
+                    ) : (
+                      participant.user && (
+                        <>
+                          <Avatar>
+                            <AvatarImage
+                              src={participant.user.avatar_url ?? undefined}
+                              alt={participant.user.username ?? ""}
+                            />
+                            <AvatarFallback>
+                              {getInitials(participant.user.username)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <p className="font-medium">{participant.user.username}</p>
+                        </>
+                      )
+                    )}
                   </div>
                   {participant.role === "host" && <Badge variant="secondary">호스트</Badge>}
                 </div>
