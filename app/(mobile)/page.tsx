@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Calendar, Link as LinkIcon, Users } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  // 인증 상태 확인
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-md space-y-10 text-center">
@@ -43,13 +50,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CTA 버튼 */}
+        {/* CTA 버튼 - 로그인 상태에 따라 다르게 표시 */}
         <div className="pt-4">
-          <Link href="/auth/login" className="block">
-            <Button size="lg" className="w-full rounded-xl py-6 text-base font-semibold shadow-lg">
-              Google로 시작하기
-            </Button>
-          </Link>
+          {user ? (
+            <Link href="/events" className="block">
+              <Button
+                size="lg"
+                className="w-full rounded-xl py-6 text-base font-semibold shadow-lg"
+              >
+                이벤트 보러가기
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/auth/login" className="block">
+              <Button
+                size="lg"
+                className="w-full rounded-xl py-6 text-base font-semibold shadow-lg"
+              >
+                Google로 시작하기
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* 부가 정보 */}
