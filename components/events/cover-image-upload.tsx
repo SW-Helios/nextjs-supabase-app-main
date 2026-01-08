@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,12 +16,28 @@ interface CoverImageUploadProps {
 }
 
 /**
+ * URL에서 파일명 추출
+ * Supabase Storage URL 형식: https://xxx.supabase.co/storage/v1/object/public/event-covers/{timestamp}_{originalFileName}
+ */
+const extractFileName = (url: string): string => {
+  const parts = url.split("/");
+  const fullName = parts[parts.length - 1];
+  // 타임스탬프 제거 (형식: timestamp_originalFileName)
+  const underscoreIndex = fullName.indexOf("_");
+  if (underscoreIndex > 0) {
+    return decodeURIComponent(fullName.substring(underscoreIndex + 1));
+  }
+  return decodeURIComponent(fullName);
+};
+
+/**
  * 커버 이미지 업로드 공통 컴포넌트
  *
  * 이벤트 생성/수정 폼에서 공통으로 사용하는 이미지 업로드 UI입니다.
  * - 이미지 미리보기
  * - 파일 선택 및 업로드
  * - 이미지 삭제
+ * - 파일명 표시
  * - 로딩 상태 표시
  */
 export function CoverImageUpload({
@@ -34,6 +50,14 @@ export function CoverImageUpload({
   // 이미지 업로드 관련 상태
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialImageUrl || null);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  // 초기 이미지 URL에서 파일명 추출
+  useEffect(() => {
+    if (initialImageUrl) {
+      setFileName(extractFileName(initialImageUrl));
+    }
+  }, [initialImageUrl]);
 
   // 파일 업로드 핸들러
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,9 +81,10 @@ export function CoverImageUpload({
     try {
       setIsUploading(true);
 
-      // 로컬 미리보기 생성
+      // 로컬 미리보기 생성 및 파일명 저장
       const localPreviewUrl = URL.createObjectURL(file);
       setPreviewUrl(localPreviewUrl);
+      setFileName(file.name);
 
       // FormData 생성 및 파일 추가
       const formData = new FormData();
@@ -73,13 +98,15 @@ export function CoverImageUpload({
         form.setValue("cover_image_url", result.data.url);
         showSuccess("이미지가 성공적으로 업로드되었습니다.");
       } else {
-        // 업로드 실패 시 미리보기 제거
+        // 업로드 실패 시 미리보기 및 파일명 제거
         setPreviewUrl(null);
+        setFileName(null);
         showError(result.message);
       }
     } catch (error) {
       console.error("이미지 업로드 실패:", error);
       setPreviewUrl(null);
+      setFileName(null);
       showError("이미지 업로드 중 오류가 발생했습니다.");
     } finally {
       setIsUploading(false);
@@ -89,6 +116,7 @@ export function CoverImageUpload({
   // 이미지 삭제 핸들러
   const handleRemoveImage = () => {
     setPreviewUrl(null);
+    setFileName(null);
     form.setValue("cover_image_url", "");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -101,18 +129,27 @@ export function CoverImageUpload({
     <div className="space-y-4">
       {/* 미리보기 영역 */}
       {previewUrl ? (
-        <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
-          <Image src={previewUrl} alt="커버 이미지 미리보기" fill className="object-cover" />
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            className="absolute top-2 right-2"
-            onClick={handleRemoveImage}
-            disabled={isDisabled}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        <div className="space-y-2">
+          {/* 이미지 미리보기 */}
+          <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
+            <Image src={previewUrl} alt="커버 이미지 미리보기" fill className="object-cover" />
+          </div>
+          {/* 파일명 및 삭제 버튼 */}
+          {fileName && (
+            <div className="bg-muted/50 flex items-center justify-between rounded-lg px-3 py-2 text-sm">
+              <span className="text-muted-foreground truncate">{fileName}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveImage}
+                disabled={isDisabled}
+                className="text-destructive hover:text-destructive ml-2 h-6 w-6 shrink-0 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         /* 업로드 버튼 영역 */
