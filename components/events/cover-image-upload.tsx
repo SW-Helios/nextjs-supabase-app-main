@@ -94,8 +94,8 @@ export function CoverImageUpload({
       const result = await uploadCoverImageAction(formData);
 
       if (result.success && result.data?.url) {
-        // 업로드된 URL을 폼에 설정
-        form.setValue("cover_image_url", result.data.url);
+        // 업로드된 URL을 폼에 설정 (shouldDirty로 폼 상태 업데이트)
+        form.setValue("cover_image_url", result.data.url, { shouldDirty: true });
         showSuccess("이미지가 성공적으로 업로드되었습니다.");
       } else {
         // 업로드 실패 시 미리보기 및 파일명 제거
@@ -117,7 +117,7 @@ export function CoverImageUpload({
   const handleRemoveImage = () => {
     setPreviewUrl(null);
     setFileName(null);
-    form.setValue("cover_image_url", "");
+    form.setValue("cover_image_url", "", { shouldDirty: true });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
