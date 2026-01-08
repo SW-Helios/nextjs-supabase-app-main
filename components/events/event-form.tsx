@@ -67,7 +67,8 @@ export function EventForm() {
       formData.append("latitude", data.latitude?.toString() || "");
       formData.append("longitude", data.longitude?.toString() || "");
       formData.append("event_date", data.event_date);
-      formData.append("cover_image_url", data.cover_image_url || "");
+      // form.getValues()로 현재 값을 직접 가져옴 (setValue로 설정된 값 반영)
+      formData.append("cover_image_url", form.getValues("cover_image_url") || "");
       formData.append("participant_ids", JSON.stringify(data.participant_ids));
 
       // Server Action 호출
