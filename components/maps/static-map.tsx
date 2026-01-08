@@ -29,8 +29,8 @@ export function StaticMap({
   height = "h-48",
   className = "",
 }: StaticMapProps) {
-  const hasCoordinates = latitude !== null && latitude !== undefined &&
-                         longitude !== null && longitude !== undefined;
+  const hasCoordinates =
+    latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined;
 
   // 네이버 지도 딥링크 생성
   const getNaverMapUrl = () => {
@@ -53,11 +53,11 @@ export function StaticMap({
       <button
         type="button"
         onClick={handleOpenMap}
-        className={`flex w-full items-center gap-2 rounded-lg border bg-muted/50 p-4 text-left transition-colors hover:bg-muted ${className}`}
+        className={`bg-muted/50 hover:bg-muted flex w-full items-center gap-2 rounded-lg border p-4 text-left transition-colors ${className}`}
       >
-        <MapPin className="h-5 w-5 shrink-0 text-primary" />
+        <MapPin className="text-primary h-5 w-5 shrink-0" />
         <span className="flex-1 text-sm">{address}</span>
-        <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <ExternalLink className="text-muted-foreground h-4 w-4 shrink-0" />
       </button>
     );
   }
@@ -85,11 +85,11 @@ export function StaticMap({
       <button
         type="button"
         onClick={handleOpenMap}
-        className="flex w-full items-center gap-2 rounded-lg border bg-muted/50 p-3 text-left transition-colors hover:bg-muted"
+        className="bg-muted/50 hover:bg-muted flex w-full items-center gap-2 rounded-lg border p-3 text-left transition-colors"
       >
-        <MapPin className="h-4 w-4 shrink-0 text-primary" />
+        <MapPin className="text-primary h-4 w-4 shrink-0" />
         <span className="flex-1 truncate text-sm">{address}</span>
-        <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+        <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
           <ExternalLink className="h-3 w-3" />
           지도 앱에서 보기
         </span>

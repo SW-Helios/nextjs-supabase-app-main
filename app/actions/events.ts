@@ -682,7 +682,8 @@ export async function updateEventStatusAction(
     revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
 
-    const statusText = newStatus === "completed" ? "종료" : newStatus === "active" ? "진행 중" : "취소";
+    const statusText =
+      newStatus === "completed" ? "종료" : newStatus === "active" ? "진행 중" : "취소";
 
     return {
       success: true,

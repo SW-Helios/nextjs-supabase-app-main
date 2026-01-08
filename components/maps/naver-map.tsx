@@ -110,10 +110,10 @@ export function NaverMap({
   if (!clientId || clientId === "your_client_id_here") {
     return (
       <div
-        className={`flex flex-col items-center justify-center rounded-lg border bg-muted ${height} ${className}`}
+        className={`bg-muted flex flex-col items-center justify-center rounded-lg border ${height} ${className}`}
       >
-        <MapPin className="h-8 w-8 text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">지도 API 키가 필요합니다</p>
+        <MapPin className="text-muted-foreground h-8 w-8" />
+        <p className="text-muted-foreground mt-2 text-sm">지도 API 키가 필요합니다</p>
       </div>
     );
   }
@@ -125,15 +125,15 @@ export function NaverMap({
       <div className={`relative overflow-hidden rounded-lg ${height} ${className}`}>
         {/* 로딩 상태 */}
         {!isMapLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div className="bg-muted absolute inset-0 flex items-center justify-center">
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
           </div>
         )}
 
         {/* 에러 상태 */}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-            <p className="text-sm text-destructive">{error}</p>
+          <div className="bg-destructive/10 absolute inset-0 flex items-center justify-center">
+            <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
 

@@ -37,49 +37,56 @@ export function LocationPicker({
       ? { lat: initialValue.latitude, lng: initialValue.longitude }
       : null
   );
-  const [mapCenter, setMapCenter] = useState(
-    coordinates || DEFAULT_CENTER
-  );
+  const [mapCenter, setMapCenter] = useState(coordinates || DEFAULT_CENTER);
 
   // 주소 선택 핸들러
-  const handleAddressSelect = useCallback((result: SearchResult) => {
-    const newAddress = result.roadAddress || result.jibunAddress;
-    const newCoordinates = { lat: result.lat, lng: result.lng };
+  const handleAddressSelect = useCallback(
+    (result: SearchResult) => {
+      const newAddress = result.roadAddress || result.jibunAddress;
+      const newCoordinates = { lat: result.lat, lng: result.lng };
 
-    setAddress(newAddress);
-    setCoordinates(newCoordinates);
-    setMapCenter(newCoordinates);
+      setAddress(newAddress);
+      setCoordinates(newCoordinates);
+      setMapCenter(newCoordinates);
 
-    onChange?.({
-      address: newAddress,
-      latitude: result.lat,
-      longitude: result.lng,
-    });
-  }, [onChange]);
+      onChange?.({
+        address: newAddress,
+        latitude: result.lat,
+        longitude: result.lng,
+      });
+    },
+    [onChange]
+  );
 
   // 주소 텍스트만 변경 (좌표 없음)
-  const handleAddressChange = useCallback((newAddress: string) => {
-    setAddress(newAddress);
+  const handleAddressChange = useCallback(
+    (newAddress: string) => {
+      setAddress(newAddress);
 
-    // 주소만 변경되고 좌표는 유지
-    onChange?.({
-      address: newAddress,
-      latitude: coordinates?.lat || null,
-      longitude: coordinates?.lng || null,
-    });
-  }, [coordinates, onChange]);
+      // 주소만 변경되고 좌표는 유지
+      onChange?.({
+        address: newAddress,
+        latitude: coordinates?.lat || null,
+        longitude: coordinates?.lng || null,
+      });
+    },
+    [coordinates, onChange]
+  );
 
   // 지도 클릭 핸들러 (역지오코딩은 미구현, 좌표만 업데이트)
-  const handleMapClick = useCallback((lat: number, lng: number) => {
-    const newCoordinates = { lat, lng };
-    setCoordinates(newCoordinates);
+  const handleMapClick = useCallback(
+    (lat: number, lng: number) => {
+      const newCoordinates = { lat, lng };
+      setCoordinates(newCoordinates);
 
-    onChange?.({
-      address,
-      latitude: lat,
-      longitude: lng,
-    });
-  }, [address, onChange]);
+      onChange?.({
+        address,
+        latitude: lat,
+        longitude: lng,
+      });
+    },
+    [address, onChange]
+  );
 
   // initialValue 변경 시 동기화
   useEffect(() => {
@@ -114,7 +121,7 @@ export function LocationPicker({
 
       {/* 선택된 좌표 표시 (디버그용, 필요시 제거) */}
       {coordinates && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           좌표: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
         </p>
       )}

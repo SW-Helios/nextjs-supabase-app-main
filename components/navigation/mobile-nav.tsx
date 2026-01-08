@@ -69,9 +69,9 @@ export function MobileNav() {
           {mounted ? (
             <>
               {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-muted-foreground" />
+                <Sun className="text-muted-foreground h-5 w-5" />
               ) : (
-                <Moon className="h-5 w-5 text-muted-foreground" />
+                <Moon className="text-muted-foreground h-5 w-5" />
               )}
               <span className="text-muted-foreground text-xs">
                 {theme === "dark" ? "라이트" : "다크"}
@@ -79,7 +79,7 @@ export function MobileNav() {
             </>
           ) : (
             <>
-              <Moon className="h-5 w-5 text-muted-foreground" />
+              <Moon className="text-muted-foreground h-5 w-5" />
               <span className="text-muted-foreground text-xs">다크</span>
             </>
           )}

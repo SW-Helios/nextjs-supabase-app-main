@@ -35,7 +35,7 @@ export function CommentSection({ eventId, comments, currentUserId, isAdmin }: Co
         {currentUserId ? (
           <CommentForm eventId={eventId} />
         ) : (
-          <p className="text-muted-foreground text-center text-sm py-2">
+          <p className="text-muted-foreground py-2 text-center text-sm">
             댓글을 작성하려면{" "}
             <Link href="/auth/login" className="text-primary underline">
               로그인

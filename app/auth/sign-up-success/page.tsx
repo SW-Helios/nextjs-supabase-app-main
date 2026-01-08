@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Page() {
   const router = useRouter();
@@ -48,8 +42,8 @@ export default function Page() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground text-sm">
-                회원가입이 완료되었습니다. 이메일로 전송된 확인 링크를 클릭하여
-                계정을 활성화해주세요.
+                회원가입이 완료되었습니다. 이메일로 전송된 확인 링크를 클릭하여 계정을
+                활성화해주세요.
               </p>
               <p className="text-muted-foreground text-sm">
                 {countdown}초 후 홈 화면으로 이동합니다...

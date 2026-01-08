@@ -41,7 +41,12 @@ const DEFAULT_ZOOM = 15;
  * 지도 인스턴스와 마커를 관리합니다.
  */
 export function useNaverMap(options: UseNaverMapOptions = {}): UseNaverMapReturn {
-  const { center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM, isScriptLoaded = false, showZoomControl = true } = options;
+  const {
+    center = DEFAULT_CENTER,
+    zoom = DEFAULT_ZOOM,
+    isScriptLoaded = false,
+    showZoomControl = true,
+  } = options;
 
   const [map, setMap] = useState<NaverMapInstance | null>(null);
   const [marker, setMarker] = useState<NaverMarkerInstance | null>(null);

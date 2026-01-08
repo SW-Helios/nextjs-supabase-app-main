@@ -69,11 +69,7 @@ export function ShareDialog({ open, onOpenChange, inviteCode, eventTitle }: Shar
           <div className="flex items-center gap-2">
             <Input value={inviteUrl} readOnly className="font-mono text-sm" />
             <Button type="button" size="icon" variant="outline" onClick={handleCopy}>
-              {copied ? (
-                <Check className="h-4 w-4 text-green-600" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
+              {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
         </div>

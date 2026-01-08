@@ -155,7 +155,7 @@ export function AddressSearchInput({
     <div ref={containerRef} className={cn("relative", className)}>
       {/* 검색 입력 */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           ref={inputRef}
           type="text"
@@ -165,33 +165,33 @@ export function AddressSearchInput({
           onFocus={() => results.length > 0 && setIsOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className="pl-9 pr-9"
+          className="pr-9 pl-9"
         />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin" />
         )}
       </div>
 
       {/* 검색 결과 드롭다운 */}
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+        <div className="bg-popover absolute z-50 mt-1 w-full rounded-md border shadow-lg">
           <ul className="max-h-60 overflow-auto py-1">
             {results.map((result, index) => (
               <li
                 key={index}
                 className={cn(
-                  "cursor-pointer px-3 py-2 text-sm transition-colors hover:bg-accent",
+                  "hover:bg-accent cursor-pointer px-3 py-2 text-sm transition-colors",
                   selectedIndex === index && "bg-accent"
                 )}
                 onClick={() => handleSelect(result)}
                 onMouseEnter={() => setSelectedIndex(index)}
               >
                 <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  <MapPin className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
                   <div className="min-w-0">
                     <p className="truncate font-medium">{result.roadAddress}</p>
                     {result.jibunAddress && (
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="text-muted-foreground truncate text-xs">
                         (지번) {result.jibunAddress}
                       </p>
                     )}
@@ -205,8 +205,8 @@ export function AddressSearchInput({
 
       {/* 검색 결과 없음 */}
       {isOpen && results.length === 0 && inputValue.length >= 2 && !isLoading && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover p-3 shadow-lg">
-          <p className="text-center text-sm text-muted-foreground">검색 결과가 없습니다</p>
+        <div className="bg-popover absolute z-50 mt-1 w-full rounded-md border p-3 shadow-lg">
+          <p className="text-muted-foreground text-center text-sm">검색 결과가 없습니다</p>
         </div>
       )}
     </div>
