@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUserProfile } from "@/lib/queries/profile";
+import { LogoutButton } from "@/components/logout-button";
 
 /**
  * 모바일 헤더 컴포넌트 (Server Component)
@@ -28,6 +29,7 @@ export async function MobileHeader() {
         <span className="text-sm font-medium">
           안녕하세요, <span className="text-primary">{displayName}</span>님
         </span>
+        <LogoutButton />
       </div>
     </header>
   );
