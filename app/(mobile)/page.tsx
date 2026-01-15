@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, Link as LinkIcon, Users } from "lucide-react";
+import { Calendar, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -30,14 +30,6 @@ export default async function Home() {
             <h3 className="text-sm font-semibold">간편한 이벤트 생성</h3>
             <p className="text-muted-foreground text-xs leading-snug">
               제목, 날짜, 장소만 입력하면 즉시 이벤트 생성
-            </p>
-          </div>
-
-          <div className="bg-card text-card-foreground flex flex-col items-center space-y-2 rounded-xl border p-4">
-            <LinkIcon className="text-primary h-8 w-8" />
-            <h3 className="text-sm font-semibold">원클릭 초대 시스템</h3>
-            <p className="text-muted-foreground text-xs leading-snug">
-              자동 생성된 초대 링크를 카카오톡으로 간편 공유
             </p>
           </div>
 
