@@ -2,16 +2,14 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 export function LogoutButton() {
-  const router = useRouter();
-
   const logout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/");
+    // 전체 페이지 새로고침으로 서버 컴포넌트 재렌더링
+    window.location.href = "/";
   };
 
   return (
